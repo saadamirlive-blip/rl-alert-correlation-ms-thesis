@@ -1,0 +1,14 @@
+                           precision    recall  f1-score   support
+
+                   BENIGN     1.0000    1.0000    1.0000     25122
+     Data_Exfiltration_C2     1.0000    1.0000    1.0000       106
+Host_Privilege_Escalation     1.0000    1.0000    1.0000       110
+        Network_Port_Scan     1.0000    1.0000    1.0000       136
+                  Web_RCE     1.0000    1.0000    1.0000        36
+        Web_SQL_Injection     1.0000    1.0000    1.0000        29
+                  Web_XSS     1.0000    1.0000    1.0000        27
+       Webshell_Execution     1.0000    1.0000    1.0000        31
+
+                 accuracy                         1.0000     25597
+                macro avg     1.0000    1.0000    1.0000     25597
+             weighted avg     1.0000    1.0000    1.0000     25597
