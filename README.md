@@ -1,54 +1,165 @@
 # Reinforcement Learning-Based Adaptive Alerts Correlation for Detecting Multi-Stage Cyber Attacks
-## 100% Proposal-Aligned MS Thesis Production Repository
+## MS Thesis Production Repository (Bahria University Islamabad)
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![RL Engines: DQN & PPO](https://img.shields.io/badge/RL_Engines-Double--DQN_%26_PPO-success.svg)](#)
+[![RL Engines: Double-DQN & PPO](https://img.shields.io/badge/RL_Engines-Double--DQN_%26_PPO-success.svg)](#)
 [![Telemetry: 3-Tier Multi-Source](https://img.shields.io/badge/Telemetry-Firewall_%7C_Web--WAF_%7C_Endpoint-orange.svg)](#)
-[![Reproducibility: Seed 42](https://img.shields.io/badge/Reproducibility-Seed_42_Deterministic-blueviolet.svg)](#)
+[![Public Datasets: DARPA_UNSW_CICIDS](https://img.shields.io/badge/Public_Datasets-DARPA2000_%7C_UNSW--NB15_%7C_CICIDS2017-purple.svg)](#)
+[![Statistical Validation: 5-Seed Rigor](https://img.shields.io/badge/Evaluation-5--Seed_Mean_±_SD-brightgreen.svg)](#)
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-Launch_1--Click_Browser_IDE-blue.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=saadamirlive-blip/rl-alert-correlation-ms-thesis)
 
-Production-grade research implementation for the MS Thesis:  
-**"Reinforcement Learning-Based Adaptive Alerts Correlation for Detecting Multi-Stage Cyber Attacks"**  
-*Candidate:* Haaziq Rasool | *Department of Computer Science, Bahria University Islamabad* | *Supervisor:* Dr. Hafiz Ishfaq Ahmad
-
----
-
-## 🎯 Discrepancies Resolved vs. Initial Repository
-
-| # | Proposal Requirement | Previous Repo Status | Aligned Implementation Status |
-|---|---|---|---|
-| **1** | **3-Tier Telemetry** | Network flow data only | **Complete 3-Tier Integration**: Perimeter Firewall + Web/WAF (HTTP URLs, SQLi/XSS/RCE) + Endpoint (auditd/Sysmon process execution) |
-| **2** | **Dual RL Engines** | DQN only | **DQN (Value-Based)** & **PPO (Policy-Gradient)** side-by-side with asymmetric reward schedules |
-| **3** | **Generalization** | F1 dropped on external data | **Universal Normalized State Representation** ensuring robust transferability across multi-tier testbeds and public benchmarks |
-| **4** | **Classifier Transfer** | Fixed to 122 flow features | **Unified Character & Word N-gram TF-IDF NLP Layer** processing raw web/endpoint payloads into calibrated confidence scores |
-| **5** | **Stealth Robustness** | Unexplored under long delays | **Systematic Adversarial Stress Test** ($\Delta t = 0\text{s}$ to $3600\text{s}$) proving RL retains 100% recall while static rules collapse to 16.7% |
+**Author / Candidate:** Haaziq Rasool  
+**Department:** Department of Computer Science, Bahria University Islamabad  
+**Supervisor:** Dr. Hafiz Ishfaq Ahmad  
+**Degree:** Master of Science in Computer Science (MSCS) / Cybersecurity  
 
 ---
 
-## 📊 Master Comparative Benchmark Results
+## 🎯 Executive Summary & Proposal Alignment
 
-| Model / Algorithm | Precision | Recall (Sensitivity) | F1-Score | False Alarm Rate (FAR) | False Positives (FP) | False Negatives (FN) | Latency (μs) | Throughput (eps) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Naive Sliding-Window Rules** | 100.00% | 40.00% | 0.5714 | 0.00% | 0 | 75 | 1.8 μs | 550,000 eps |
-| **Unsupervised Isolation Forest** | 29.49% | 73.60% | 0.4211 | 3.42% | 220 | 33 | 8.2 μs | 121,950 eps |
-| **Supervised Random Forest** | 100.00% | 100.00% | 1.0000 | 0.00% | 0 | 0 | 4.8 μs | 208,333 eps |
-| **Proposed RL (Double-DQN)** | **100.00%** | **100.00%** | **1.0000** | **0.00%** | **0** | **0** | **13.6 μs** | **73,344 eps** |
-| **Proposed RL (PPO)** | **100.00%** | **100.00%** | **1.0000** | **0.00%** | **0** | **0** | **18.4 μs** | **54,347 eps** |
+This repository hosts the complete, scientifically verified implementation of **Reinforcement Learning-Based Adaptive Alerts Correlation for Detecting Multi-Stage Cyber Attacks**. The framework addresses the fundamental challenge of alert fatigue and disjoint telemetry in Security Operations Centers (SOCs) by formulating multi-stage alert correlation as an episodic **Markov Decision Process (MDP)**.
+
+### Key Architectural Pillars
+1. **3-Tier Heterogeneous Telemetry Ingestion**: Integrates Perimeter Firewall (Tier 1), Web Application Firewall (Tier 2), and Host/Endpoint Auditd/Syslog (Tier 3).
+2. **Zero-Target-Leakage Observable Feature Extraction**: Operates on real-time observable attributes and Stage-3 NLP character/word n-gram predictions—completely free of ground-truth label leakage.
+3. **Dual Reinforcement Learning Correlators**: Evaluates value-based **Double-DQN** with prioritized replay memory and on-policy **PPO** with Generalized Advantage Estimation (GAE).
+4. **Public Benchmark Cross-Domain Validation**: Evaluated on **DARPA 2000 (LLDOS 1.0)**, **UNSW-NB15**, and **CICIDS2017** under zero-shot transfer.
+5. **Multi-Seed Statistical Rigor**: Evaluated across 5 independent random seeds (`42, 101, 2024, 777, 999`) on strictly held-out test partitions.
 
 ---
 
-## 🚀 1-Click Execution
+## 📊 Master Benchmark Evaluation (5-Seed Statistical Rigor)
 
-To run the entire pipeline from scratch, execute:
+*Evaluated on strictly disjoint held-out test partition (1,632 alert pairs) across 5 independent random seeds ($\text{Mean} \pm \text{SD}$)*:
 
-```bash
-python run_full_pipeline.py
+| Model / Algorithm | Precision (%) | Recall (Sensitivity %) | F1-Score | False Alarm Rate (FAR %) | Latency ($\mu\text{s}$) | Streaming Throughput |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Naive Rule Engine** (Fixed $\Delta t \le 300\text{s}$) | $71.77 \pm 0.00$ | $100.00 \pm 0.00$ | $0.8356 \pm 0.0000$ | $7.87 \pm 0.00$ | **$0.6\,\mu\text{s}$** | $1,666,000\,\text{pairs/s}$ |
+| **Isolation Forest** (Unsupervised) | $70.06 \pm 2.64$ | $58.53 \pm 1.19$ | $0.6377 \pm 0.0176$ | $5.01 \pm 0.53$ | $130.7\,\mu\text{s}$ | $7,650\,\text{pairs/s}$ |
+| **Supervised Random Forest** | $100.00 \pm 0.00$ | $100.00 \pm 0.00$ | $1.0000 \pm 0.0000$ | $0.00 \pm 0.00$ | $175.4\,\mu\text{s}$ | $5,700\,\text{pairs/s}$ |
+| **Proposed RL (Double-DQN)** | **$95.71 \pm 4.36$** | **$100.00 \pm 0.00$** | **$0.9776 \pm 0.0231$** | **$0.94 \pm 0.98$** | **$10.0\,\mu\text{s}$** | **$100,000\,\text{pairs/s}$** |
+| **Proposed RL (PPO)** | $34.98 \pm 32.30$ | $74.41 \pm 22.52$ | $0.3593 \pm 0.1412$ | $65.07 \pm 43.50$ | $26.6\,\mu\text{s}$ | $37,590\,\text{pairs/s}$ |
+
+---
+
+## 🌐 Public Benchmark Cross-Domain Validation (DARPA 2000, UNSW-NB15, CICIDS2017)
+
+To evaluate generalization, the Double-DQN model was tested in a **Zero-Shot Transfer** setting on three standard public datasets without any fine-tuning or retraining.
+
+### 1. Unified 3-Tier Schema Mapping
+All public datasets are normalized into the standard 3-tier schema:
+
+| Dataset Scenario | Multi-Stage Cyber Kill-Chain Phases | Mapped Telemetry Tier |
+| :--- | :--- | :--- |
+| **DARPA 2000 (LLDOS 1.0)** | Phase 1: ICMP Echo IP Sweep<br>Phase 2/3: Sadmind RPC Buffer Overflow<br>Phase 4: mstream Daemon Installation<br>Phase 5: Distributed UDP Flood | **Tier 1 (Firewall)**<br>**Tier 2 (Web/WAF)**<br>**Tier 3 (Endpoint)**<br>**Tier 3 $\to$ Tier 1 (Exfil)** |
+| **UNSW-NB15 (Multi-Class)** | Step 1: Reconnaissance (PortScan)<br>Step 2: Web Exploits / Fuzzers<br>Step 3: Shellcode / Backdoor Execution<br>Step 4: Generic Data Exfiltration | **Tier 1 (Firewall)**<br>**Tier 2 (Web/WAF)**<br>**Tier 3 (Endpoint)**<br>**Tier 3 $\to$ Tier 1** |
+| **CICIDS2017 (Infiltration)** | Tuesday: SSH-Patator / PortScan<br>Thursday: SQLi / XSS Web Attacks<br>Friday: Infiltration & Privilege Escalation<br>Friday (Late): Botnet C2 / Exfiltration | **Tier 1 (Firewall)**<br>**Tier 2 (Web/WAF)**<br>**Tier 3 (Endpoint)**<br>**Tier 3 $\to$ Tier 1** |
+
+### 2. Zero-Shot Cross-Domain Results
+
+| Public Benchmark Dataset | Zero-Shot Precision (%) | Zero-Shot Recall (%) | Zero-Shot F1-Score | False Alarm Rate (FAR %) |
+| :--- | :---: | :---: | :---: | :---: |
+| **DARPA 2000 (LLDOS 1.0)** | **$100.00\%$** | **$78.57\%$** | **$0.8800$** | **$0.00\%$** |
+| **UNSW-NB15 (Multi-Class)** | **$100.00\%$** | **$33.33\%$** | **$0.5000$** | **$0.00\%$** |
+| **CICIDS2017 (Infiltration)** | **$62.50\%$** | **$33.33\%$** | **$0.4348$** | **$4.00\%$** |
+
+---
+
+## 🔬 Scientific Analysis: Why Double-DQN Outperforms PPO in SOC Telemetry
+
+A key scientific finding of this thesis is the empirical comparison between **value-based Q-learning (Double-DQN)** and **policy-gradient Actor-Critic (PPO)**:
+
+1. **Off-Policy Sample Efficiency on Sparse Attacks**:
+   - In cyber telemetry, $>95\%$ of alerts are benign, making true attack links rare ($<5\%$).
+   - **Double-DQN leverages an Experience Replay Buffer ($N=25,000$)**, repeatedly sampling and learning from past attack transitions across hundreds of training steps.
+   - **PPO is strictly on-policy** and discards collected trajectories after each update. In an imbalanced environment, PPO's trajectory buffer is flooded with benign negative transitions, which suppresses policy confidence for attack transitions.
+2. **Sharp Decision Margins vs Softmax Dilution**:
+   - Double-DQN directly optimizes the scalar utility margin $\Delta Q(s) = Q(s, \text{Link}) - Q(s, \text{Ignore})$.
+   - PPO produces continuous Softmax probabilities $[p_0, p_1]$, which are diluted toward lower confidence ($p_1 \approx 0.30 - 0.45$) by the overwhelming majority of benign steps.
+3. **Sub-Millisecond Inference Speed**:
+   - Double-DQN evaluates in **$10.0\,\mu\text{s}$ per alert pair** ($17.5\times$ faster than 100-tree Random Forest at $175.4\,\mu\text{s}$), enabling a real-time streaming throughput of **100,000 alert pairs/sec** on standard CPU hardware.
+
+---
+
+## 📁 Repository Directory Structure
+
+```
+.
+├── README.md                                # Master documentation and thesis benchmark report
+├── requirements.txt                         # Python dependencies
+├── docs/
+│   ├── MS_Thesis_Haaziq_Rasool.docx         # Complete MS Thesis Document
+│   └── MS_Thesis_Complete_Aligned.docx      # 6-Chapter Thesis DOCX
+├── src/
+│   ├── scientific_multi_seed_study.py       # 18-Phase Multi-Seed Benchmark Suite (Seeds 42, 101, 2024, 777, 999)
+│   ├── public_datasets_evaluator.py         # DARPA 2000, UNSW-NB15 & CICIDS2017 Cross-Domain Ingestion
+│   ├── dqn_agent.py                         # Standalone Double-DQN Multi-Layer Correlator
+│   ├── ppo_agent.py                         # Standalone Actor-Critic PPO Correlator
+│   ├── correlation_env.py                   # Gymnasium Sequential MDP Telemetry Environment
+│   ├── unified_schema.py                    # Unified 3-Tier Schema & Observable Feature Extractor
+│   ├── attack_identifier_nlp.py             # Stage-3 Character/Word N-Gram TF-IDF Classifier
+│   ├── adversarial_eval.py                  # Slow-Rate Stealth Delay Stress Test (0s - 3600s)
+│   ├── campaign_reconstruction.py           # NetworkX Attack Graph Builder & Campaign Aggregator
+│   ├── master_evaluator.py                  # 5-Model Comparative Evaluator
+│   └── generate_plots.py                    # Publication-Quality IEEE Matplotlib Visualizer
+├── results/
+│   ├── scientific_audit_multi_seed_results.json # Multi-seed metrics (Mean ± SD)
+│   ├── public_benchmarks_results.json       # DARPA 2000, UNSW-NB15 & CICIDS2017 Results
+│   ├── master_evaluation_metrics.json       # Evaluated baseline metrics
+│   ├── fig1_master_comparison.png           # 5-Model Performance Comparison Bar Chart
+│   ├── fig2_rl_training_convergence.png     # RL Training Reward Convergence Curves
+│   ├── fig3_adversarial_stealth_benchmark.png# Stealth Timing Attack Resilience Curve
+│   ├── fig4_reconstructed_campaign_graph.png# Reconstructed Kill-Chain Attack Graph
+│   └── fig5_latency_throughput.png          # Sub-millisecond Latency & Throughput Profile
+└── models/
+    ├── dqn_correlator.pkl                   # Trained Double-DQN Weights
+    ├── ppo_correlator.pkl                   # Trained Actor-Critic PPO Weights
+    └── web_attack_nlp.joblib                # Trained TF-IDF NLP Payload Model
 ```
 
-This single command will:
-1. Generate the 3-Tier Multi-Source Synthetic Telemetry (~35,000 events, 150 4-stage campaigns).
-2. Train the Stage 3 Supervised NLP Attack Identifier on web & endpoint payloads.
-3. Train the Double-DQN and PPO correlation agents on the sequential MDP environment.
-4. Execute the 5-Model comparative benchmark and compute all metrics (ARI, Precision, Recall, F1, FAR, Latency).
-5. Run the Adversarial Stealth Delay benchmark ($\Delta t = 0\text{s}$ to $3600\text{s}$).
-6. Render IEEE publication-quality figures in `results/`.
-7. Generate the complete 6-chapter thesis Word document `docs/MS_Thesis_Complete_Aligned.docx`.
+---
+
+## ⚡ Quickstart & Replication
+
+### Option A: Run in GitHub Codespaces (Browser)
+1. Open this repository in [GitHub Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=saadamirlive-blip/rl-alert-correlation-ms-thesis).
+2. Run the multi-seed benchmark:
+   ```bash
+   python src/scientific_multi_seed_study.py
+   ```
+3. Run the public benchmark evaluation:
+   ```bash
+   python src/public_datasets_evaluator.py
+   ```
+
+### Option B: Local Setup
+```bash
+# Clone the repository
+git clone https://github.com/saadamirlive-blip/rl-alert-correlation-ms-thesis.git
+cd rl-alert-correlation-ms-thesis
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run 18-phase multi-seed evaluation
+python src/scientific_multi_seed_study.py
+
+# Run DARPA 2000, UNSW-NB15, and CICIDS2017 public benchmarks
+python src/public_datasets_evaluator.py
+```
+
+---
+
+## 📜 Citation & Academic Contact
+
+If you use this codebase or methodology in your academic work, please cite:
+
+```bibtex
+@mastersthesis{rasool2026reinforcement,
+  title={Reinforcement Learning-Based Adaptive Alerts Correlation for Detecting Multi-Stage Cyber Attacks},
+  author={Rasool, Haaziq},
+  school={Bahria University Islamabad, Department of Computer Science},
+  year={2026},
+  supervisor={Ahmad, Hafiz Ishfaq}
+}
+```
