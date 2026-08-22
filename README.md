@@ -15,13 +15,13 @@
 
 ---
 
-## 🎯 Executive Summary & Proposal Alignment
+## 🎯 Executive Summary & Architectural Pillars
 
-This repository hosts the complete, scientifically verified implementation of **Reinforcement Learning-Based Adaptive Alerts Correlation for Detecting Multi-Stage Cyber Attacks**. The framework addresses the fundamental challenge of alert fatigue and disjoint telemetry in Security Operations Centers (SOCs) by formulating multi-stage alert correlation as an episodic **Markov Decision Process (MDP)**.
+This repository hosts the complete, scientifically verified implementation of **Reinforcement Learning-Based Adaptive Alerts Correlation for Detecting Multi-Stage Cyber Attacks**. The framework addresses alert fatigue and disjoint telemetry in Security Operations Centers (SOCs) by formulating multi-stage alert correlation as an episodic **Markov Decision Process (MDP)**.
 
-### Key Architectural Pillars
+### Architectural Highlights
 1. **3-Tier Heterogeneous Telemetry Ingestion**: Integrates Perimeter Firewall (Tier 1), Web Application Firewall (Tier 2), and Host/Endpoint Auditd/Syslog (Tier 3).
-2. **Zero-Target-Leakage Observable Feature Extraction**: Operates on real-time observable attributes and Stage-3 NLP character/word n-gram predictions—completely free of ground-truth label leakage.
+2. **Zero-Target-Leakage Feature Extraction**: Uses exclusively real-time observable attributes and Stage-3 NLP predictions—completely purged of ground-truth label leakage.
 3. **Dual Reinforcement Learning Correlators**: Evaluates value-based **Double-DQN** with prioritized replay memory and on-policy **PPO** with Generalized Advantage Estimation (GAE).
 4. **Public Benchmark Cross-Domain Validation**: Evaluated on **DARPA 2000 (LLDOS 1.0)**, **UNSW-NB15**, and **CICIDS2017** under zero-shot transfer.
 5. **Multi-Seed Statistical Rigor**: Evaluated across 5 independent random seeds (`42, 101, 2024, 777, 999`) on strictly held-out test partitions.
@@ -40,52 +40,89 @@ This repository hosts the complete, scientifically verified implementation of **
 | **Proposed RL (Double-DQN)** | **$95.71 \pm 4.36$** | **$100.00 \pm 0.00$** | **$0.9776 \pm 0.0231$** | **$0.94 \pm 0.98$** | **$10.0\,\mu\text{s}$** | **$100,000\,\text{pairs/s}$** |
 | **Proposed RL (PPO)** | $34.98 \pm 32.30$ | $74.41 \pm 22.52$ | $0.3593 \pm 0.1412$ | $65.07 \pm 43.50$ | $26.6\,\mu\text{s}$ | $37,590\,\text{pairs/s}$ |
 
+### Figure 1: 5-Model Comparative Performance
+![Figure 1: Comparative Evaluation](results/fig1_master_comparison.png)
+
+---
+
+## 📈 RL Training Reward Convergence & Policy Stability
+
+### Figure 2: Double-DQN Value vs. PPO Policy Convergence
+![Figure 2: RL Training Convergence](results/fig2_rl_training_convergence.png)
+
+- **Double-DQN (Value-Based)** converges stably within 150 episodes due to off-policy experience replay memory ($N=25,000$).
+- **PPO (Actor-Critic)** stabilizes under GAE advantage normalization and entropy regularization, achieving steady policy gradient updates.
+
+---
+
+## 🛡️ Adversarial Stealth Delay Stress Test ($\Delta t = 0\text{s}$ to $3600\text{s}$)
+
+To simulate stealthy APT actors who intentionally insert long temporal delays between attack steps to evade fixed correlation windows:
+
+### Figure 3: Adversarial Stealth Timing Attack Resilience
+![Figure 3: Stealth Timing Evasion Benchmark](results/fig3_adversarial_stealth_benchmark.png)
+
+- **Naive Rule Engine collapses to 0.0% recall** once inter-stage delay $\Delta t > 300\text{s}$.
+- **Proposed Double-DQN retains 100.0% recall** across all delays up to 1 hour ($3600\text{s}$) by evaluating topological progression and payload confidence independent of rigid timer thresholds.
+
 ---
 
 ## 🌐 Public Benchmark Cross-Domain Validation (DARPA 2000, UNSW-NB15, CICIDS2017)
 
-To evaluate generalization, the Double-DQN model was tested in a **Zero-Shot Transfer** setting on three standard public datasets without any fine-tuning or retraining.
+To evaluate zero-shot generalization, the Double-DQN agent was evaluated directly on three landmark public cybersecurity datasets without retraining:
 
 ### 1. Unified 3-Tier Schema Mapping
-All public datasets are normalized into the standard 3-tier schema:
-
 | Dataset Scenario | Multi-Stage Cyber Kill-Chain Phases | Mapped Telemetry Tier |
 | :--- | :--- | :--- |
 | **DARPA 2000 (LLDOS 1.0)** | Phase 1: ICMP Echo IP Sweep<br>Phase 2/3: Sadmind RPC Buffer Overflow<br>Phase 4: mstream Daemon Installation<br>Phase 5: Distributed UDP Flood | **Tier 1 (Firewall)**<br>**Tier 2 (Web/WAF)**<br>**Tier 3 (Endpoint)**<br>**Tier 3 $\to$ Tier 1 (Exfil)** |
 | **UNSW-NB15 (Multi-Class)** | Step 1: Reconnaissance (PortScan)<br>Step 2: Web Exploits / Fuzzers<br>Step 3: Shellcode / Backdoor Execution<br>Step 4: Generic Data Exfiltration | **Tier 1 (Firewall)**<br>**Tier 2 (Web/WAF)**<br>**Tier 3 (Endpoint)**<br>**Tier 3 $\to$ Tier 1** |
 | **CICIDS2017 (Infiltration)** | Tuesday: SSH-Patator / PortScan<br>Thursday: SQLi / XSS Web Attacks<br>Friday: Infiltration & Privilege Escalation<br>Friday (Late): Botnet C2 / Exfiltration | **Tier 1 (Firewall)**<br>**Tier 2 (Web/WAF)**<br>**Tier 3 (Endpoint)**<br>**Tier 3 $\to$ Tier 1** |
 
-### 2. Zero-Shot Cross-Domain Results
-
+### 2. Empirical Zero-Shot Transfer Results
 | Public Benchmark Dataset | Zero-Shot Precision (%) | Zero-Shot Recall (%) | Zero-Shot F1-Score | False Alarm Rate (FAR %) |
 | :--- | :---: | :---: | :---: | :---: |
 | **DARPA 2000 (LLDOS 1.0)** | **$100.00\%$** | **$78.57\%$** | **$0.8800$** | **$0.00\%$** |
 | **UNSW-NB15 (Multi-Class)** | **$100.00\%$** | **$33.33\%$** | **$0.5000$** | **$0.00\%$** |
 | **CICIDS2017 (Infiltration)** | **$62.50\%$** | **$33.33\%$** | **$0.4348$** | **$4.00\%$** |
 
+### Figure 6: Zero-Shot Transfer Across Public Datasets
+![Figure 6: Public Datasets Benchmark](results/fig6_public_datasets_benchmark.png)
+
+---
+
+## 🔍 Reconstructed Multi-Stage Attack Graph
+
+### Figure 4: Kill-Chain Causal Graph Reconstructed by RL Correlator
+![Figure 4: Reconstructed Kill-Chain Graph](results/fig4_reconstructed_campaign_graph.png)
+
+---
+
+## ⚡ Sub-Millisecond Latency & SOC Throughput Profile
+
+### Figure 5: Decision Latency & Streaming Throughput
+![Figure 5: Latency and Throughput Profile](results/fig5_latency_throughput.png)
+
+- **Double-DQN executes in $10.0\,\mu\text{s}$ per pair**, delivering a streaming correlation throughput of **100,000 alert pairs/sec** on a single CPU core ($17.5\times$ faster than 100-tree Random Forest).
+
 ---
 
 ## 🔬 Scientific Analysis: Why Double-DQN Outperforms PPO in SOC Telemetry
 
-A key scientific finding of this thesis is the empirical comparison between **value-based Q-learning (Double-DQN)** and **policy-gradient Actor-Critic (PPO)**:
-
 1. **Off-Policy Sample Efficiency on Sparse Attacks**:
-   - In cyber telemetry, $>95\%$ of alerts are benign, making true attack links rare ($<5\%$).
+   - In SOC telemetry, $>95\%$ of alert pairs are benign, making true attack links rare ($<5\%$).
    - **Double-DQN leverages an Experience Replay Buffer ($N=25,000$)**, repeatedly sampling and learning from past attack transitions across hundreds of training steps.
    - **PPO is strictly on-policy** and discards collected trajectories after each update. In an imbalanced environment, PPO's trajectory buffer is flooded with benign negative transitions, which suppresses policy confidence for attack transitions.
 2. **Sharp Decision Margins vs Softmax Dilution**:
    - Double-DQN directly optimizes the scalar utility margin $\Delta Q(s) = Q(s, \text{Link}) - Q(s, \text{Ignore})$.
    - PPO produces continuous Softmax probabilities $[p_0, p_1]$, which are diluted toward lower confidence ($p_1 \approx 0.30 - 0.45$) by the overwhelming majority of benign steps.
-3. **Sub-Millisecond Inference Speed**:
-   - Double-DQN evaluates in **$10.0\,\mu\text{s}$ per alert pair** ($17.5\times$ faster than 100-tree Random Forest at $175.4\,\mu\text{s}$), enabling a real-time streaming throughput of **100,000 alert pairs/sec** on standard CPU hardware.
 
 ---
 
-## 📁 Repository Directory Structure
+## 📁 Repository Structure
 
 ```
 .
-├── README.md                                # Master documentation and thesis benchmark report
+├── README.md                                # Master documentation with embedded publication figures
 ├── requirements.txt                         # Python dependencies
 ├── docs/
 │   ├── MS_Thesis_Haaziq_Rasool.docx         # Complete MS Thesis Document
@@ -110,7 +147,8 @@ A key scientific finding of this thesis is the empirical comparison between **va
 │   ├── fig2_rl_training_convergence.png     # RL Training Reward Convergence Curves
 │   ├── fig3_adversarial_stealth_benchmark.png# Stealth Timing Attack Resilience Curve
 │   ├── fig4_reconstructed_campaign_graph.png# Reconstructed Kill-Chain Attack Graph
-│   └── fig5_latency_throughput.png          # Sub-millisecond Latency & Throughput Profile
+│   ├── fig5_latency_throughput.png          # Sub-millisecond Latency & Throughput Profile
+│   └── fig6_public_datasets_benchmark.png   # Cross-Domain Zero-Shot Transfer on Public Datasets
 └── models/
     ├── dqn_correlator.pkl                   # Trained Double-DQN Weights
     ├── ppo_correlator.pkl                   # Trained Actor-Critic PPO Weights
@@ -151,8 +189,6 @@ python src/public_datasets_evaluator.py
 ---
 
 ## 📜 Citation & Academic Contact
-
-If you use this codebase or methodology in your academic work, please cite:
 
 ```bibtex
 @mastersthesis{rasool2026reinforcement,
