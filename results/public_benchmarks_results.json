@@ -1,0 +1,35 @@
+{
+  "DARPA 2000 (LLDOS 1.0)": {
+    "precision": 100.0,
+    "recall": 78.57142857142857,
+    "f1_score": 0.88,
+    "far": 0.0,
+    "tp": 11,
+    "fp": 0,
+    "fn": 3,
+    "tn": 70,
+    "total_pairs": 84
+  },
+  "UNSW-NB15 (Multi-Class)": {
+    "precision": 100.0,
+    "recall": 33.33333333333333,
+    "f1_score": 0.4999999999999999,
+    "far": 0.0,
+    "tp": 10,
+    "fp": 0,
+    "fn": 20,
+    "tn": 150,
+    "total_pairs": 180
+  },
+  "CICIDS2017 (Infiltration)": {
+    "precision": 62.5,
+    "recall": 33.33333333333333,
+    "f1_score": 0.4347826086956521,
+    "far": 4.0,
+    "tp": 10,
+    "fp": 6,
+    "fn": 20,
+    "tn": 144,
+    "total_pairs": 180
+  }
+}
