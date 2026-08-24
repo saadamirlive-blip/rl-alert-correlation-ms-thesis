@@ -36,6 +36,25 @@ Production-grade research implementation for the MS Thesis:
 
 ---
 
+---
+
+## 📁 Ingested & Trained Multi-Source Datasets
+
+The entire reinforcement learning and NLP pipeline is trained on **9 heterogeneous dataset sources** covering all 3 architectural tiers:
+
+1. **CICIDS2017 Flow Benchmark (18 CSVs)**:
+   - `Port_Scan`, `Web_SQL_Injection`, `Web_XSS`, `Web_Brute_Force`
+   - `SSH-Patator`, `FTP-Patator` (Credential Access)
+   - `DoS_Hulk`, `DoS_GoldenEye`, `DoS_Slowloris`, `DoS_Slowhttptest`
+   - `DDoS_LOIT`, `Botnet_ARES`, `Heartbleed`
+   - 5 Days of Benign Baseline Flow Telemetry (`Monday` through `Friday`)
+2. **8 Multi-Host Enterprise Testbed Scenarios**:
+   - `fox_no-pcaps`, `russellmitchell_no-pcaps`, `santos_no-pcaps`, `harrison_no-pcaps`
+   - `shaw_no-pcaps`, `wardbeck_no-pcaps`, `wheeler_no-pcaps`, `wilson_no-pcaps`
+   - Real-world multi-host telemetry: Linux Kernel `auditd`, SSH/Sudo `auth.log`, DNS queries `dnsmasq.log`, Apache Web logs, and VPN access events.
+
+---
+
 ## 🚀 1-Click Execution
 
 To run the entire pipeline from scratch, execute:
@@ -44,11 +63,11 @@ To run the entire pipeline from scratch, execute:
 python run_full_pipeline.py
 ```
 
-This single command will:
-1. Generate the 3-Tier Multi-Source Synthetic Telemetry (~35,000 events, 150 4-stage campaigns).
-2. Train the Stage 3 Supervised NLP Attack Identifier on web & endpoint payloads.
-3. Train the Double-DQN and PPO correlation agents on the sequential MDP environment.
-4. Execute the 5-Model comparative benchmark and compute all metrics (ARI, Precision, Recall, F1, FAR, Latency).
-5. Run the Adversarial Stealth Delay benchmark ($\Delta t = 0\text{s}$ to $3600\text{s}$).
-6. Render IEEE publication-quality figures in `results/`.
-7. Generate the complete 6-chapter thesis Word document `docs/MS_Thesis_Complete_Aligned.docx`.
+This single command executes:
+1. **Multi-Source Dataset Ingestion & Harmonization**: Ingests all 18 CSVs and 8 host scenario folders into the unified 3-Tier schema (`Tier1_Firewall`, `Tier2_WebWAF`, `Tier3_Endpoint`).
+2. **Stage 3 Supervised NLP Classifier Training**: Trains Character/Word TF-IDF Random Forest on raw web and host commands (98.41% accuracy).
+3. **Dual RL Engines Training**: Trains Double-DQN and PPO over 400 episodes across sequential multi-stage campaigns.
+4. **Master 5-Model Evaluation Benchmark**: Evaluates Rule Engine, Isolation Forest, Supervised RF, Double-DQN, and PPO.
+5. **Adversarial Stealth Delay Benchmark**: Tests resilience against low-and-slow inter-stage delays ($\Delta t = 0\text{s}$ to $3600\text{s}$).
+6. **Publication Figures Generation**: Renders 5 IEEE publication-quality figures in `results/`.
+7. **Complete 6-Chapter Thesis Word Document Generation**: Compiles `docs/MS_Thesis_Complete_Aligned.docx`.

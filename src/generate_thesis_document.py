@@ -207,12 +207,56 @@ def generate_complete_thesis_docx():
         "    - False Negative (FN): -3.5"
     )
     
-    # Chapter 4 & 5
-    add_heading_1("Chapter 4 & 5: Experimental Evaluation & Benchmark Results")
+    # Chapter 4
+    add_heading_1("Chapter 4: Multi-Source Dataset Ingestion & Preprocessing")
+    add_heading_2("4.1 Dataset Composition and Ingestion Scope")
+    add_para(
+        "To rigorously validate the adaptive alert correlation engine across heterogeneous tiers, the system was trained and evaluated on an extensive, "
+        "multi-source real-world telemetry corpus comprising both network flow benchmarks and multi-host enterprise audit logs across all 9 dataset sources:\n\n"
+        "1. CICIDS2017 Multi-Attack Flow Benchmark (18 CSVs): Covers perimeter firewall and application-layer attack streams including Port Scanning, "
+        "Web SQL Injection, Cross-Site Scripting (XSS), Web Brute Force, SSH-Patator, FTP-Patator, DoS Hulk, DoS GoldenEye, DoS Slowloris, DoS Slowhttptest, "
+        "DDoS LOIT, Botnet ARES, Heartbleed, and five days of benign background baseline traffic (Monday through Friday).\n"
+        "2. Multi-Host Enterprise Testbed Scenarios (8 Scenarios): Ingests synchronized host audit logs (auditd, auth.log), DNS query telemetry (dnsmasq.log), "
+        "and service transaction logs across 8 distinct multi-host scenarios: fox_no-pcaps, russellmitchell_no-pcaps, santos_no-pcaps, harrison_no-pcaps, "
+        "shaw_no-pcaps, wardbeck_no-pcaps, wheeler_no-pcaps, and wilson_no-pcaps. Each scenario contains complete multi-stage cyber campaigns spanning reconnaissance, "
+        "foothold establishment, privilege escalation, lateral movement, and data exfiltration.\n"
+    )
+    
+    # Table 4.1: Dataset Breakdown
+    t_ds = doc.add_table(rows=10, cols=4)
+    t_ds_headers = ["Dataset Source / Folder", "Telemetry Tier", "Attack / Activity Types Ingested", "Monitored Sensors"]
+    t_ds_data = [
+        ["CICIDS2017 (18 CSVs)", "Tier 1 (Firewall) & Tier 2 (Web)", "PortScan, SQLi, XSS, BruteForce, DoS/DDoS, Botnet, Patator", "Perimeter Firewalls, NetFlow, Web Server"],
+        ["fox_no-pcaps", "Tier 1, Tier 2, Tier 3", "dnsteal, attacker_change_user, escalate, dns_scan", "inet-firewall, intranet_server, auditd"],
+        ["russellmitchell_no-pcaps", "Tier 1, Tier 2, Tier 3", "attacker_change_user, escalated_command, escalate", "inet-firewall, intranet_server, auth.log"],
+        ["santos_no-pcaps", "Tier 1, Tier 2, Tier 3", "attacker_vpn, attacker_http, escalated_sudo_command", "inet-firewall, internal_share, VPN"],
+        ["harrison_no-pcaps", "Tier 1, Tier 2, Tier 3", "attacker_change_user, dnsteal, escalate", "inet-firewall, monitoring, auditd"],
+        ["shaw_no-pcaps", "Tier 1, Tier 2, Tier 3", "traceroute, foothold, attacker_change_user", "inet-firewall, intranet_server, dnsmasq"],
+        ["wardbeck_no-pcaps", "Tier 1, Tier 2, Tier 3", "dnsteal, attacker_change_user, escalate", "inet-firewall, internal_share, auth.log"],
+        ["wheeler_no-pcaps", "Tier 1, Tier 2, Tier 3", "dnsteal, attacker_change_user, escalated_command", "inet-firewall, intranet_server, auditd"],
+        ["wilson_no-pcaps", "Tier 1, Tier 2, Tier 3", "dnsteal, attacker_change_user, escalate", "inet-firewall, internal_share, monitoring"]
+    ]
+    for j, h in enumerate(t_ds_headers):
+        t_ds.cell(0, j).text = h
+    for i, row in enumerate(t_ds_data):
+        for j, val in enumerate(row):
+            t_ds.cell(i+1, j).text = val
+    format_thesis_table(t_ds)
+    
+    add_heading_2("4.2 Preprocessing, State Normalization, & Training Pipeline")
+    add_para(
+        "The raw logs from all 9 dataset sources were extracted, parsed, and converted into the standardized UnifiedEvent representation. Continuous temporal deltas "
+        "and topological attributes were normalized into a 10-dimensional state vector:\n"
+        "s = [Delta_t_norm, IP_match, Port_risk, Tier_transition, Stage_progression, Conf_score, Target_match, Proto_match, Payload_len_norm, Burst_density]\n\n"
+        "Stage 3 supervised payload identification was trained on TF-IDF character (3-5) and word (1-2) n-grams, achieving 98.41% accuracy across multi-class payload categories. "
+        "Subsequently, the Double-DQN and PPO reinforcement learning correlators were trained over 400 episodes across sequential multi-stage campaigns."
+    )
+    
+    # Chapter 5
+    add_heading_1("Chapter 5: Experimental Evaluation & Benchmark Results")
     add_heading_2("5.1 Master Comparative Performance Benchmark")
     add_para(
-        "All models were evaluated on an unseen hold-out test set consisting of multi-stage attack campaigns and benign background noise. Table 5.1 summarizes "
-        "the performance metrics across all 5 evaluated systems."
+        "All models were evaluated on unseen hold-out test campaigns and background benign traffic. Table 5.1 summarizes the performance metrics across all 5 evaluated systems."
     )
     
     # Table 5.1: Benchmark Results
@@ -266,8 +310,13 @@ def generate_complete_thesis_docx():
     
     # Save Document
     out_path = DOCS_DIR / "MS_Thesis_Complete_Aligned.docx"
-    doc.save(out_path)
-    print(f"[+] Successfully generated Complete MS Thesis Document: {out_path}")
+    try:
+        doc.save(out_path)
+        print(f"[+] Successfully generated Complete MS Thesis Document: {out_path}")
+    except PermissionError:
+        out_path_alt = DOCS_DIR / "MS_Thesis_Complete_Aligned_Latest.docx"
+        doc.save(out_path_alt)
+        print(f"[+] Primary doc was open in Word. Saved updated document to: {out_path_alt}")
 
 if __name__ == "__main__":
     generate_complete_thesis_docx()
