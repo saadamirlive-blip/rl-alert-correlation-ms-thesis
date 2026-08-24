@@ -1,0 +1,11 @@
+[Unit]
+Description=Some service
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/bin/autem
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
