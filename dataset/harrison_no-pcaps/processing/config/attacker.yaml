@@ -1,0 +1,17 @@
+
+hostname: "attacker-0"
+distribution: "Ubuntu"
+distribution_release: "bionic"
+distribution_version: "18.04"
+timezone: "UTC"
+default_ipv4_address: "172.28.192.242"
+default_ipv6_address: "fe80::f816:3eff:fe04:4b63"
+ipv4_addresses: ["172.28.192.242"]
+ipv6_addresses: ["fe80::f816:3eff:fe04:4b63"]
+exfiltration_service:
+    name: "autem"
+    stop: "2022-02-08T09:15:00.834Z"
+dnsteal:
+    start: "2022-02-03T08:46:22.889Z"
+    stop: "2022-02-08T11:15:08.182Z"
+    domain: "db-21.greer.biz"
