@@ -1,0 +1,1149 @@
+max_errors: 1000
+start_time: 2021-03-28T00:01
+end_time: 2027-04-03T21:00
+schedule:
+  work_days:
+    friday:
+      end_time: '22:28'
+      start_time: 08:03
+    monday:
+      end_time: '17:53'
+      start_time: 08:55
+    saturday:
+      end_time: '20:59'
+      start_time: 05:04
+    sunday:
+      end_time: '20:24'
+      start_time: 06:22
+    thursday:
+      end_time: '18:17'
+      start_time: 09:35
+    tuesday:
+      end_time: '20:50'
+      start_time: 05:13
+    wednesday:
+      end_time: '18:04'
+      start_time: 06:18
+
+
+selenium:
+  # browser type to use
+  type: chromium
+  accept_insecure_ssl: True
+  headless: True
+  window_width: 1650
+  window_height: 1200
+  window_x_position: 0
+  window_y_position: 0
+  # The implicit time the selenium driver waits when looking up an element
+  implicit_wait: 3
+  #driver_manager:
+    # The webdriver cache path
+    #path: /some/path
+    # The base URL to download the webdriver from.
+    #url: https://chromedriver.storage.googleapis.com
+    # The URL for the latest version of the webdriver
+    #latest_release_url: <the url>
+    # Log level for the webdriver manager.
+    #log_level: INFO
+    # The validity of the driver cache in days.
+    #cache_valid_range: 1
+
+  proxy:
+    enabled: False
+    host: "localhost"
+    port: 8080
+    # If a socks proxy should be used instead of a HTTP proxy
+    socks: False
+    # The SOCKS protocol version to use
+    socks_version: 5
+    # The socks username and password to use for authentication
+    #username: fancy_user
+    #password: secret
+
+  download:
+    prompt: False
+    path: /var/log/kyoushi/ait.beta_user/downloads/
+    autosave:
+      - application/octet-stream
+      - application/zip
+      - application/vnd.rar
+      - application/x-7z-compressed
+      - application/msword
+      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      - application/vnd.ms-excel
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      - application/vnd.ms-powerpoint
+      - application/vnd.openxmlformats-officedocument.presentationml.presentation
+      - application/vnd.oasis.opendocument.text
+      - application/vnd.oasis.opendocument.spreadsheet
+      - application/vnd.oasis.opendocument.presentation
+      - text/plain
+      - application/pdf
+      - application/postscript
+      - image/jpeg
+      - image/bmp
+      - image/gif
+      - image/png
+      - image/svg+xml
+      - image/tiff
+
+
+  # Additional commandline arguments for the webdriver
+  arguments: []
+  # Extra dictionary of desired browser capabilities
+  capabilities: []
+
+idle:
+  big:
+    min: 529 # 10*60 = 10m
+    max: 2614  # 50*60 = 50m
+  medium:
+    min: 120 # 1m
+    max: 335  # 5*60 = 5m
+  small:
+    min: 9 # 5s
+    max: 47  # 30s
+  tiny:
+    min: 0.4628512329658319 # 500ms
+    max: 2.3601593826307963  # 1s500ms
+
+# VPN activities configuration
+
+vpn:
+  enabled: False
+  #config: /some/path/conf.ovpn
+  eager: True
+  horde: True
+  owncloud: False
+  ssh_user: True
+  web_browser: True
+  wp_editor: False
+  wpdiscuz: False
+
+# States configuration
+
+states:
+  activities:
+    horde: 0.2379125683967897
+    idle: 0.1483475483143997
+    owncloud: 0.09738057932290689
+    ssh_user: 0.0
+    web_browser: 0.16150839792894128
+    wp_editor: 0.15963420598398714
+    wpdiscuz: 0.19521670005297526
+
+  horde:
+    address_book_page:
+      browse_contacts: 0.642837571496713
+      extra:
+        return_increase: 1.2061834683036143
+      new_contact: 0.22738502720281092
+      return: 0.12977740130047608
+    admin_groups_page:
+      extra:
+        return_increase: 1.6191093411911899
+      group_add: 0.3005028103132171
+      group_delete: 0.21919617765967572
+      return: 0.48030101202710723
+    admin_page:
+      extra:
+        return_increase: 1.5630324895402798
+      nav_alarms: 0.12791671859573397
+      nav_cli_shell: 0.04346535614481344
+      nav_config: 0.12145496787043042
+      nav_groups: 0.2355049163060141
+      nav_locks: 0.12045425293640116
+      nav_permissions: 0.057704274660617005
+      nav_php_shell: 0.015722166162668562
+      nav_sessions: 0.09905319591114112
+      nav_sql_shell: 0.05481044985447922
+      nav_users: 0.04947649006859798
+      return: 0.074437211489103
+    calendar_page:
+      edit_event: 0.2775701952075479
+      extra:
+        return_increase: 1.545575993595944
+      new_event: 0.37841703193698706
+      return: 0.3440127728554651
+    contact_info:
+      delete_contact: 0.3368395227544602
+      do_nothing: 0.6631604772455396
+    contacts_browser:
+      new_contact: 0.3092553829163962
+      view_contact: 0.6907446170836038
+    event_edit:
+      delete_event: 0.5313082100651821
+      write_event: 0.4686917899348179
+    login_page:
+      fail_chance: 0.01617135355000513
+      fail_decrease: 0.9434529625494799
+    logout_choice:
+      logout_chance: 0.06799977220412028
+    mail_info:
+      delete_mail: 0.38638846095478513
+      reply_mail: 0.6136115390452149
+    mail_view:
+      delete_mail: 0.1585349801698645
+      do_nothing: 0.3004599604298968
+      open_mail: 0.5410050594002388
+    mails_page:
+      extra:
+        return_increase: 1.1944541637209913
+      new_mail: 0.25363144627812534
+      refresh_mail: 0.1492134399862641
+      return: 0.08386464759317425
+      view_mail: 0.5132904661424363
+    note_editor:
+      delete_note: 0.4705427708650085
+      write_note: 0.5294572291349916
+    notes_page:
+      edit_note: 0.4625550071838512
+      extra:
+        return_increase: 1.6278896788012096
+      new_note: 0.47482135376988543
+      return: 0.0626236390462634
+    selecting_menu:
+      extra:
+        return_increase: 1.6123948853021715
+      nav_address_book: 0.10004024562014989
+      nav_admin: 0.0
+      nav_calendar: 0.14005693146922849
+      nav_mail: 0.3373738426755613
+      nav_notes: 0.11769520204296448
+      nav_preferences: 0.11236430398260994
+      nav_tasks: 0.11939616697303838
+      return: 0.0730733072364475
+    tasks_page:
+      edit_task: 0.41728289710880956
+      extra:
+        return_increase: 1.390387695297743
+      new_task: 0.5133018069512058
+      return: 0.06941529593998473
+
+  owncloud:
+    all_files:
+      create_directory: 0.08898677891303258
+      delete_directory: 0.08009225480280603
+      delete_file: 0.05403244441349509
+      download_directory: 0.04438411296673329
+      download_file: 0.0778194675180372
+      extra:
+        return_increase: 1.3011678488801715
+      favorite: 0.03471966977563949
+      nav_root: 0.09381468395783185
+      open_directory: 0.1407049666246055
+      remove_favorite: 0.0912657210391221
+      return: 0.08388385902928248
+      scroll_down: 0.051412321975767394
+      upload_file: 0.04988331221906693
+      view_details: 0.1090004067645799
+    favorites:
+      delete_directory: 0.024932575691926164
+      delete_file: 0.07635663226086571
+      download_directory: 0.08453257872194304
+      download_file: 0.07116686533146074
+      extra:
+        return_increase: 1.4615406120433871
+      favorite: 0.04337564598683974
+      open_directory: 0.20468911181949956
+      remove_favorite: 0.024560961602242557
+      return: 0.12698564475042015
+      scroll_down: 0.14655420453848234
+      view_details: 0.19684577929632005
+    file_details:
+      extra:
+        return_increase: 1.3203659814217659
+      return: 0.09612800245128389
+      view_comments: 0.30235076839777925
+      view_sharing: 0.4069940546021508
+      view_versions: 0.19452717454878607
+    login_page:
+      fail_chance: 0.021844046869902094
+      fail_decrease: 0.8889717083529278
+    logout_choice:
+      logout_chance: 0.07363263426352008
+    selecting_menu:
+      extra:
+        return_increase: 1.3413681415151935
+      nav_all: 0.25327723499982446
+      nav_favorites: 0.2544442995991495
+      nav_sharing_in: 0.17305839474602175
+      nav_sharing_out: 0.18861418124007337
+      return: 0.13060588941493081
+    sharing_details:
+      extra:
+        max_shares: 4
+        return_increase: 1.3015260853838053
+        share_users:
+          jfoster: 5.533318737955212e-05
+          jgreen: 0.19464826575135843
+          jmoreno: 5.533318737955212e-05
+          jthompson: 5.533318737955212e-05
+          jward: 0.3759688135464209
+          lwright: 0.2779998767823319
+          moliver: 5.533318737955212e-05
+          rchambers: 0.15116171117037044
+      return: 0.25601236027339214
+      share: 0.25367676812140144
+      unshare: 0.4903108716052064
+    sharing_in:
+      accept: 0.5075807218713758
+      decline: 0.26283843281811436
+      extra:
+        return_increase: 1.4891412135130475
+      return: 0.11974050385254462
+      scroll_down: 0.10984034145796534
+    sharing_out:
+      delete_directory: 0.07759177871242376
+      delete_file: 0.058359350070413825
+      download_directory: 0.10853215388942931
+      download_file: 0.09727043600348904
+      extra:
+        return_increase: 1.3500562522605597
+      favorite: 0.09868728628187957
+      open_directory: 0.15047978261581763
+      remove_favorite: 0.02342665815738719
+      return: 0.10355282054587658
+      scroll_down: 0.11580712995409675
+      view_details: 0.16629260376918625
+    upload_menu:
+      keep_both: 0.33870912230595895
+      keep_new: 0.5907607081117925
+      keep_old: 0.07053016958224859
+
+  web_browser:
+    leaving_website:
+      background: 0.4057342690397239
+      close: 0.594265730960276
+    on_website:
+      leave_website: 0.18755206902320634
+      visit_link: 0.8124479309767937
+
+  wp_editor:
+    comments_page:
+      extra:
+        reply_only_guests: true
+        return_increase: 1.1161461282553993
+      new_reply: 0.3717056324052542
+      return: 0.6282943675947459
+    login_page:
+      fail_chance: 0.03278591136056093
+      fail_decrease: 0.8767593099763096
+    logout_choice:
+      logout_chance: 0.03282515454008592
+    posts_page:
+      extra:
+        max_posts_daily: 1
+        return_increase: 1.194629695291181
+      new_post: 0.7484553591153709
+      return: 0.25154464088462913
+    selecting_menu:
+      extra:
+        return_increase: 1.2263991026543415
+      nav_comments: 0.28341161421631966
+      nav_dashboard: 0.10791878782899429
+      nav_media: 0.1532746570823615
+      nav_posts: 0.2827983322733479
+      return: 0.17259660859897658
+
+  wpdiscuz:
+    close_choice:
+      close: 0.4861176181513955
+      leave_open: 0.5138823818486046
+    post_page:
+      comment: 0.1401814268178829
+      down_vote: 0.07418564159039694
+      extra:
+        max_level: 6
+        max_rating: 3
+        min_rating: 1
+        return_increase: 1.1662107197906215
+      rate_post: 0.15962188350721404
+      reply: 0.2948654907211327
+      return: 0.1509782611798955
+      up_vote: 0.18016729618347796
+    posts_page:
+      extra:
+        max_page: 5
+        return_increase: 1.1857527427075576
+      nav_newer: 0.26157017125281307
+      nav_older: 0.13685400913083798
+      nav_post: 0.3007386567952259
+      return: 0.30083716282112316
+
+  # Disabled activities
+  #ssh_user:
+
+
+# activity user configurations
+
+# Horde User
+horde:
+  # The maximum amount of times the horde activity will be entered per day
+  max_daily: 8
+  # The horde servers base URL
+  url: http://mail.mannsmith.harrison.com
+  # The firstname of the horde user
+  first_name: Hunter
+  #The lastname of the horde user
+  last_name: Smith
+  # The horde user
+  username: hunter.smith
+  # The horde users password
+  password: 1xhU0quo0cRL
+  mail:
+    # The email contacts for the horde user
+    # <email>: <probability>
+    contacts:
+      alan.gonzalez@taylor.harrison.com: 4.034820729236597e-05
+      jeffrey.green@mannsmith.harrison.com: 4.034820729236597e-05
+      jessica.ward@mannsmith.harrison.com: 4.034820729236597e-05
+      joann.moreno@mannsmith.harrison.com: 4.034820729236597e-05
+      joseph.foster@mannsmith.harrison.com: 0.2906107657153728
+      june.thompson@mannsmith.harrison.com: 4.034820729236597e-05
+      kerry.smith@taylor.harrison.com: 0.2504524089737213
+      leslie.williams@taylor.harrison.com: 0.09861580121366025
+      logan.wright@mannsmith.harrison.com: 0.028377529768841774
+      megan.oliver@mannsmith.harrison.com: 4.034820729236597e-05
+      mohammed.neal@smith.harrison.com: 4.034820729236597e-05
+      ryan.chambers@mannsmith.harrison.com: 4.034820729236597e-05
+      tom.hancock@smith.harrison.com: 0.02978774117846489
+      wayne.riley@taylor.harrison.com: 0.3018329674916
+
+    # A dict of attachment files the user might send
+    attachments:
+      /home/hsmith/files/BrooksMarshAndBray.docx: 1.0761009877676868e-05
+      /home/hsmith/files/BrooksMarshAndBray.pdf: 1.0761009877676868e-05
+      /home/hsmith/files/FrazierLtd.docx: 1.0761009877676868e-05
+      /home/hsmith/files/FrazierLtd.pdf: 0.04020479901553886
+      /home/hsmith/files/HamiltonInc.docx: 0.08842325630448612
+      /home/hsmith/files/HamiltonInc.pdf: 1.0761009877676868e-05
+      /home/hsmith/files/Harris-gutierrez.docx: 1.0761009877676868e-05
+      /home/hsmith/files/Harris-gutierrez.pdf: 1.0761009877676868e-05
+      /home/hsmith/files/JonesPlc.docx: 0.06252207134973585
+      /home/hsmith/files/JonesPlc.pdf: 1.0761009877676868e-05
+      /home/hsmith/files/MoralesGroup.docx: 1.0761009877676868e-05
+      /home/hsmith/files/MoralesGroup.pdf: 0.007290481682246843
+      /home/hsmith/files/Travis-ramsey.docx: 1.0761009877676868e-05
+      /home/hsmith/files/Travis-ramsey.pdf: 1.0761009877676868e-05
+      /home/hsmith/files/White-martin.docx: 1.0761009877676868e-05
+      /home/hsmith/files/White-martin.pdf: 1.0761009877676868e-05
+      /home/hsmith/files/WilliamsBallardAndWest.docx: 1.0761009877676868e-05
+      /home/hsmith/files/WilliamsBallardAndWest.pdf: 1.0761009877676868e-05
+      /home/hsmith/files/adobe.png: 0.0008879400151170069
+      /home/hsmith/files/between.zip: 1.0761009877676868e-05
+      /home/hsmith/files/binoculars.png: 1.0761009877676868e-05
+      /home/hsmith/files/block.png: 0.03297359760132726
+      /home/hsmith/files/century.zip: 0.04609782873159274
+      /home/hsmith/files/chart.png: 0.060814482892343036
+      /home/hsmith/files/choose.zip: 0.07364971086634432
+      /home/hsmith/files/claim.txt: 0.03308377650717584
+      /home/hsmith/files/conflict.png: 1.0761009877676868e-05
+      /home/hsmith/files/contact.png: 0.05128137675759296
+      /home/hsmith/files/control.txt: 0.00861758287031072
+      /home/hsmith/files/despite.zip: 0.0010801507990038255
+      /home/hsmith/files/each.zip: 1.0761009877676868e-05
+      /home/hsmith/files/environment.zip: 0.013780827441485677
+      /home/hsmith/files/everything.zip: 0.09954229182897775
+      /home/hsmith/files/expert.zip: 1.0761009877676868e-05
+      /home/hsmith/files/feed.png: 1.0761009877676868e-05
+      /home/hsmith/files/globe.png: 1.0761009877676868e-05
+      /home/hsmith/files/golf.png: 1.0761009877676868e-05
+      /home/hsmith/files/institution.zip: 1.0761009877676868e-05
+      /home/hsmith/files/ip_addresses.xlsx: 1.0761009877676868e-05
+      /home/hsmith/files/lot.txt: 0.09214778461884522
+      /home/hsmith/files/movie.png: 0.07504199542437522
+      /home/hsmith/files/must.zip: 1.0761009877676868e-05
+      /home/hsmith/files/offer.zip: 1.0761009877676868e-05
+      /home/hsmith/files/pane.png: 0.06315654038799523
+      /home/hsmith/files/politics.zip: 0.0028142208588284898
+      /home/hsmith/files/program.txt: 1.0761009877676868e-05
+      /home/hsmith/files/puzzle.png: 1.0761009877676868e-05
+      /home/hsmith/files/reference.png: 0.05832263777970861
+      /home/hsmith/files/ruby.png: 1.0761009877676868e-05
+      /home/hsmith/files/send.png: 1.0761009877676868e-05
+      /home/hsmith/files/sister.txt: 0.0011087796463198484
+      /home/hsmith/files/smiley.png: 1.0761009877676868e-05
+      /home/hsmith/files/tag.png: 1.0761009877676868e-05
+      /home/hsmith/files/tag_green.png: 0.0094774030234792
+      /home/hsmith/files/unit.zip: 0.06539862120035103
+      /home/hsmith/files/war.txt: 0.011905207051099868
+      /home/hsmith/files/west.txt: 1.0761009877676868e-05
+      /home/hsmith/files/word.png: 1.0761009877676868e-05
+      /home/hsmith/files/world.txt: 1.0761009877676868e-05
+
+    #The propability that an additional recipient is added to a mail
+    extra_recipient: 0.10725489029671634
+    # The maximum amount of recipients
+    max_recipients: 14
+    # The propability that an attachment is added to a new email
+    attachment: 0.021230150888969714
+    # The propability that an attachment is added to a reply
+    attachment_reply: 0.03246696586967434
+
+# OwnCloud User
+owncloud:
+  # The maximum amount of times the owncloud user activity will be entered per day
+  max_daily: 8
+  # The owncloud servers url
+  url: http://cloud.mannsmith.harrison.com
+  username: hsmith
+  password: 1xhU0quo0cRL
+  # Files the user might upload mapped to their propabilities
+  #  <path>:<probability>
+  upload_files:
+    /home/hsmith/files/BrooksMarshAndBray.docx: 0.051009496559467536
+    /home/hsmith/files/BrooksMarshAndBray.pdf: 7.040470625822207e-06
+    /home/hsmith/files/FrazierLtd.docx: 7.040470625822207e-06
+    /home/hsmith/files/FrazierLtd.pdf: 7.040470625822207e-06
+    /home/hsmith/files/HamiltonInc.docx: 7.040470625822207e-06
+    /home/hsmith/files/HamiltonInc.pdf: 0.06413618189237233
+    /home/hsmith/files/Harris-gutierrez.docx: 7.040470625822207e-06
+    /home/hsmith/files/Harris-gutierrez.pdf: 0.00820260461298603
+    /home/hsmith/files/JonesPlc.docx: 0.011659092529612714
+    /home/hsmith/files/JonesPlc.pdf: 7.040470625822207e-06
+    /home/hsmith/files/MoralesGroup.docx: 0.009584525203508613
+    /home/hsmith/files/MoralesGroup.pdf: 7.040470625822207e-06
+    /home/hsmith/files/Travis-ramsey.docx: 0.03923920649370296
+    /home/hsmith/files/Travis-ramsey.pdf: 7.040470625822207e-06
+    /home/hsmith/files/White-martin.docx: 7.040470625822207e-06
+    /home/hsmith/files/White-martin.pdf: 0.041803855447114076
+    /home/hsmith/files/WilliamsBallardAndWest.docx: 0.02731090977127818
+    /home/hsmith/files/WilliamsBallardAndWest.pdf: 0.030810583934925213
+    /home/hsmith/files/adobe.png: 0.020212513205911768
+    /home/hsmith/files/between.zip: 7.040470625822207e-06
+    /home/hsmith/files/binoculars.png: 0.028564024537111436
+    /home/hsmith/files/block.png: 0.019130018141649798
+    /home/hsmith/files/century.zip: 0.030812987659078497
+    /home/hsmith/files/chart.png: 7.040470625822207e-06
+    /home/hsmith/files/choose.zip: 0.0006184836792439472
+    /home/hsmith/files/claim.txt: 0.02621885825029538
+    /home/hsmith/files/conflict.png: 7.040470625822207e-06
+    /home/hsmith/files/contact.png: 7.040470625822207e-06
+    /home/hsmith/files/control.txt: 0.046911135872564146
+    /home/hsmith/files/despite.zip: 0.06801840768895802
+    /home/hsmith/files/each.zip: 0.022290608065816415
+    /home/hsmith/files/environment.zip: 7.040470625822207e-06
+    /home/hsmith/files/everything.zip: 0.02194789276804677
+    /home/hsmith/files/expert.zip: 7.040470625822207e-06
+    /home/hsmith/files/feed.png: 0.026279001326710953
+    /home/hsmith/files/globe.png: 0.031135124062643727
+    /home/hsmith/files/golf.png: 0.03456008464165275
+    /home/hsmith/files/institution.zip: 0.032505849351329774
+    /home/hsmith/files/ip_addresses.xlsx: 0.008379010340379932
+    /home/hsmith/files/lot.txt: 7.040470625822207e-06
+    /home/hsmith/files/movie.png: 0.048609651263242404
+    /home/hsmith/files/must.zip: 7.040470625822207e-06
+    /home/hsmith/files/offer.zip: 7.040470625822207e-06
+    /home/hsmith/files/pane.png: 0.017317342942180708
+    /home/hsmith/files/politics.zip: 0.03803580500819336
+    /home/hsmith/files/program.txt: 7.040470625822207e-06
+    /home/hsmith/files/puzzle.png: 0.014911205090508133
+    /home/hsmith/files/reference.png: 7.040470625822207e-06
+    /home/hsmith/files/ruby.png: 0.06747562876221669
+    /home/hsmith/files/send.png: 7.040470625822207e-06
+    /home/hsmith/files/sister.txt: 7.040470625822207e-06
+    /home/hsmith/files/smiley.png: 7.040470625822207e-06
+    /home/hsmith/files/tag.png: 7.040470625822207e-06
+    /home/hsmith/files/tag_green.png: 0.036695813779301284
+    /home/hsmith/files/unit.zip: 7.040470625822207e-06
+    /home/hsmith/files/war.txt: 7.040470625822207e-06
+    /home/hsmith/files/west.txt: 0.03713684035938072
+    /home/hsmith/files/word.png: 0.03828716405171905
+    /home/hsmith/files/world.txt: 7.040470625822207e-06
+
+  # List of regular expresions used to control which directories can be modified. i.e., dir create, file upload, delete
+  # (default means any directory other than root)
+  modify_directories:
+    - ^\/Documents(\/.+)?$
+
+  # The maximum directory level to create sub directories in.
+  #max_directory_create_depth: 3
+  # The maximum sub directories to create.
+  #max_directory_count: 3
+  # Factor used to decrease favorite and remove_favorite chance.
+  favor_factor: 0.8899243806195686
+  # The minimum amount of scroll space that has to be available for the user to consider scrolling down.
+  min_scroll_space: 200.0
+
+# SSH User
+
+#ssh_user:
+  # The maximum amount of times the ssh user activity will be entered per day
+  #max_daily: 10
+  #username: fancy_user
+  #password: secret
+  # the default ssh key
+  #ssh_key: /home/fancy_user/.ssh/id_rsa
+
+  # If the user should verify the SSH servers host key by default
+  #verify_host: yes
+
+  # The host or IP of the default SSH proxy server
+  #proxy_host: proxy.host
+  #proxy_port: 22
+  #proxy_username: proxy
+  #proxy_ssh_key: /home/fancy_user/.ssh/id_rsa
+  # If the SSH host key should be verified or not
+  #proxy_verify_host: yes
+
+  # Default list of command chains the user can execute on the hosts.
+  #commands:
+  #  - - cmd: top
+  #          expect: "avail Mem"
+  #          idle_after: small
+  #        - "\x03" # sigint
+  #  - cmd: ls -la
+  #    chdir: /tmp
+  #  - cmd: apt-get update
+  #    sudo: yes
+  #  - whoami
+
+  # Mapping of host identifiers to the probabilities of them being selected.
+  #   <host id>:<probability>
+  #hosts:
+  #  example: 1.0
+
+  # Mapping of host identifiers to their configurations.
+  # <host id>:<HostConfig>
+  #host_configs:
+  #  example:
+  #    host: 172.16.100.111
+  #    commands:
+  #      - id
+  #      - cmd: apt-get update
+  #        sudo: yes
+  #
+  #    include_default_commands: yes
+
+# WP Editor Config
+wp_editor:
+  # The maximum amount of times the wp editor activity will be entered per day
+  max_daily: 14
+  # The wp-admin url
+  url: http://intranet.mannsmith.harrison.com/wp-admin/
+  username: hsmith
+  password: 1xhU0quo0cRL
+
+# WP Reader Config
+wpdiscuz:
+  # The maximum amount of times the wpdiscuz activity will be entered per day
+  max_daily: 14
+  # The wordpress servers base URL
+  url: http://intranet.mannsmith.harrison.com
+  # The comment authors name and email
+  author: Hunter Smith
+  email: hunter.smith@mannsmith.harrison.com
+  # The wordpress instances expected page title
+  page_title: Intranet
+
+# Web Browser
+web_browser:
+  # The maximum websites to visit per day
+  max_daily: 8
+  # The maximum link depth the user will browse to on a website
+  max_depth: 2
+  # The web site URLs the user can visit
+  websites:
+    - https://youtube.com
+    - http://apple.com
+    - https://www.google.com
+    - http://www.blogger.com
+    - https://microsoft.com
+    - http://play.google.com
+    - https://support.google.com
+    - http://linkedin.com
+    - https://maps.google.com
+    - http://youtu.be
+    - https://wordpress.org
+    - http://docs.google.com
+    - https://en.wikipedia.org
+    - http://cloudflare.com
+    - https://mozilla.org
+    - http://vimeo.com
+    - https://drive.google.com
+    - http://plus.google.com
+    - https://europa.eu
+    - http://adobe.com
+    - https://accounts.google.com
+    - http://sites.google.com
+    - https://googleusercontent.com
+    - http://es.wikipedia.org
+    - https://uol.com.br
+    - http://line.me
+    - https://bbc.co.uk
+    - http://amazon.com
+    - https://istockphoto.com
+    - http://bp.blogspot.com
+    - https://github.com
+    - http://facebook.com
+    - https://vk.com
+    - http://cnn.com
+    - https://www.yahoo.com
+    - http://bbc.com
+    - https://gstatic.com
+    - http://paypal.com
+    - https://myspace.com
+    - http://feedburner.com
+    - https://nih.gov
+    - http://t.me
+    - https://whatsapp.com
+    - http://washingtonpost.com
+    - https://google.de
+    - http://mail.google.com
+    - https://mail.ru
+    - http://imdb.com
+    - https://dropbox.com
+    - http://w3.org
+    - https://reuters.com
+    - http://nytimes.com
+    - https://globo.com
+    - http://developers.google.com
+    - https://jimdofree.com
+    - http://wikimedia.org
+    - https://bloomberg.com
+    - http://hugedomains.com
+    - https://slideshare.net
+    - http://issuu.com
+    - https://google.es
+    - http://get.google.com
+    - https://live.com
+    - http://creativecommons.org
+    - https://dailymotion.com
+    - http://msn.com
+    - https://opera.com
+    - http://medium.com
+    - https://policies.google.com
+    - http://theguardian.com
+    - https://forbes.com
+    - http://google.co.jp
+    - https://google.com.br
+    - http://fr.wikipedia.org
+    - https://news.google.com
+    - http://pt.wikipedia.org
+    - https://elpais.com
+    - http://tools.google.com
+    - https://translate.google.com
+    - http://buydomains.com
+    - https://aboutads.info
+    - http://huffpost.com
+    - https://telegram.me
+    - http://google.fr
+    - https://latimes.com
+    - http://rt.com
+    - https://time.com
+    - http://it.wikipedia.org
+    - https://samsung.com
+    - http://namecheap.com
+    - https://dan.com
+    - http://cpanel.net
+    - https://plesk.com
+    - http://wsj.com
+    - https://office.com
+    - http://nasa.gov
+    - https://harvard.edu
+    - http://news.yahoo.com
+    - https://google.pl
+    - http://www.wikipedia.org
+    - https://independent.co.uk
+    - http://huffingtonpost.com
+    - https://draft.blogger.com
+    - http://ebay.com
+    - https://goo.gl
+    - http://scribd.com
+    - https://usatoday.com
+    - http://abcnews.go.com
+    - https://cdc.gov
+    - http://indiatimes.com
+    - https://themeforest.net
+    - http://ipv4.google.com
+    - https://ft.com
+    - http://archive.org
+    - https://android.com
+    - http://cpanel.com
+    - https://change.org
+    - http://lefigaro.fr
+    - https://twitter.com
+    - http://www.gov.uk
+    - https://techcrunch.com
+    - http://webmd.com
+    - https://un.org
+    - http://picasaweb.google.com
+    - https://rakuten.co.jp
+    - http://bit.ly
+    - https://youronlinechoices.com
+    - http://mirror.co.uk
+    - https://ig.com.br
+    - http://books.google.com
+    - https://wikia.com
+    - http://google.co.uk
+    - https://marketingplatform.google.com
+    - http://businessinsider.com
+    - https://ok.ru
+    - http://amazon.co.jp
+    - https://gravatar.com
+    - http://shared.com
+    - https://amazon.co.uk
+    - http://thesun.co.uk
+    - https://cnet.com
+    - http://myaccount.google.com
+    - https://booking.com
+    - http://foxnews.com
+    - https://amazon.de
+    - http://wired.com
+    - https://abril.com.br
+    - http://terra.com.br
+    - https://google.it
+    - http://afternic.com
+    - https://mediafire.com
+    - http://fandom.com
+    - https://aol.com
+    - http://hatena.ne.jp
+    - https://id.wikipedia.org
+    - http://google.ru
+    - https://de.wikipedia.org
+    - http://steampowered.com
+    - https://who.int
+    - http://photos.google.com
+    - https://fb.com
+    - http://aliexpress.com
+    - https://files.wordpress.com
+    - http://networkadvertising.org
+    - https://pinterest.com
+    - http://tinyurl.com
+    - https://search.google.com
+    - http://telegraph.co.uk
+    - https://dailymail.co.uk
+    - http://yandex.ru
+    - https://dw.com
+    - http://ox.ac.uk
+    - https://academia.edu
+    - http://google.co.id
+    - https://detik.com
+    - http://sciencedirect.com
+    - https://naver.com
+    - http://gmail.com
+    - https://express.co.uk
+    - http://ja.wikipedia.org
+    - https://ikea.com
+    - http://npr.org
+    - https://ovh.com
+    - http://vice.com
+    - https://yahoo.co.jp
+    - http://enable-javascript.com
+    - https://britannica.com
+    - http://thetimes.co.uk
+    - https://lemonde.fr
+    - http://google.ca
+    - https://kickstarter.com
+    - http://surveymonkey.com
+    - https://buzzfeed.com
+    - http://sapo.pt
+    - https://rapidshare.com
+    - http://ea.com
+    - https://imageshack.us
+    - http://cambridge.org
+    - https://www.wix.com
+    - http://corriere.it
+    - https://playstation.com
+    - http://engadget.com
+    - https://cbsnews.com
+    - http://allaboutcookies.org
+    - https://groups.google.com
+    - http://nokia.com
+    - https://columbia.edu
+    - http://doubleclick.net
+    - https://vox.com
+    - http://photos1.blogger.com
+    - https://secureserver.net
+    - http://hp.com
+    - https://nikkei.com
+    - http://finance.yahoo.com
+    - https://whitehouse.gov
+    - http://gnu.org
+    - https://ted.com
+    - http://google.nl
+    - https://mit.edu
+    - http://ietf.org
+    - https://ria.ru
+    - http://list-manage.com
+    - https://google.com.tw
+    - http://instructables.com
+    - https://cnil.fr
+    - http://t.co
+    - https://twitch.tv
+    - http://photobucket.com
+    - https://mashable.com
+    - http://shopify.com
+    - https://amazon.es
+    - http://guardian.co.uk
+    - https://rambler.ru
+    - http://chaturbate.com
+    - https://stanford.edu
+    - http://wikihow.com
+    - https://sputniknews.com
+    - http://google.co.in
+    - https://oup.com
+    - http://eventbrite.com
+    - https://disney.com
+    - http://groups.yahoo.com
+    - https://my.yahoo.com
+    - http://nature.com
+    - https://espn.com
+    - http://bp2.blogger.com
+    - https://akamaihd.net
+    - http://urbandictionary.com
+    - https://metro.co.uk
+    - http://welt.de
+    - https://cnbc.com
+    - http://skype.com
+    - https://bloglovin.com
+    - http://yadi.sk
+    - https://stackoverflow.com
+    - http://godaddy.com
+    - https://www.over-blog.com
+    - http://sciencedaily.com
+    - https://bp0.blogger.com
+    - http://netvibes.com
+    - https://theatlantic.com
+    - http://pl.wikipedia.org
+    - https://wp.com
+    - http://digg.com
+    - https://elmundo.es
+    - http://theglobeandmail.com
+    - https://economist.com
+    - http://umich.edu
+    - https://depositfiles.com
+    - http://asus.com
+    - https://sendspace.com
+    - http://ru.wikipedia.org
+    - https://newyorker.com
+    - http://m.wikipedia.org
+    - https://ovh.net
+    - http://scoop.it
+    - https://noaa.gov
+    - http://spiegel.de
+    - https://nydailynews.com
+    - http://newsweek.com
+    - https://mozilla.com
+    - http://chicagotribune.com
+    - https://bandcamp.com
+    - http://mysql.com
+    - https://ibm.com
+    - http://deezer.com
+    - https://walmart.com
+    - http://ign.com
+    - https://princeton.edu
+    - http://rottentomatoes.com
+    - https://nbcnews.com
+    - http://over-blog-kiwi.com
+    - https://researchgate.net
+    - http://nvidia.com
+    - https://abc.net.au
+    - http://instagram.com
+    - https://cornell.edu
+    - http://sedo.com
+    - https://gofundme.com
+    - http://ziddu.com
+    - https://www.weebly.com
+    - http://hollywoodreporter.com
+    - https://nginx.org
+    - http://nypost.com
+    - https://mega.nz
+    - http://usnews.com
+    - https://icann.org
+    - http://biglobe.ne.jp
+    - https://trustpilot.com
+    - http://weibo.com
+    - https://tripadvisor.com
+    - http://wiley.com
+    - https://privacyshield.gov
+    - http://smh.com.au
+    - https://ovh.co.uk
+    - http://yelp.com
+    - https://oracle.com
+    - http://apache.org
+    - https://gizmodo.com
+    - http://bing.com
+    - https://quora.com
+    - http://wa.me
+    - https://picasa.google.com
+    - http://dell.com
+    - https://liveinternet.ru
+    - http://bitly.com
+    - https://goo.ne.jp
+    - http://search.yahoo.com
+    - https://ggpht.com
+    - http://nationalgeographic.com
+    - https://berkeley.edu
+    - http://amzn.to
+    - https://pbs.org
+    - http://theverge.com
+    - https://pixabay.com
+    - http://example.com
+    - https://ytimg.com
+    - http://box.com
+    - https://forms.gle
+    - http://yale.edu
+    - https://code.google.com
+    - http://about.com
+    - https://xbox.com
+    - http://netflix.com
+    - https://storage.googleapis.com
+    - http://goodreads.com
+    - https://abc.es
+    - http://addtoany.com
+    - https://e-recht24.de
+    - http://addthis.com
+    - https://psychologytoday.com
+    - http://zendesk.com
+    - https://amazon.fr
+    - http://sfgate.com
+    - https://utexas.edu
+    - http://sciencemag.org
+    - https://spotify.com
+    - http://discord.gg
+    - https://brandbucket.com
+    - http://hm.com
+    - https://php.net
+    - http://washington.edu
+    - https://repubblica.it
+    - http://loc.gov
+    - https://variety.com
+    - http://disqus.com
+    - https://adssettings.google.com
+    - http://greenpeace.org
+    - https://nginx.com
+    - http://news.com.au
+    - https://soundcloud.com
+    - http://cbc.ca
+    - https://nicovideo.jp
+    - http://shutterstock.com
+    - https://alibaba.com
+    - http://target.com
+    - https://unesco.org
+    - http://blackberry.com
+    - https://interia.pl
+    - http://googleblog.com
+    - https://orange.fr
+    - http://ap.org
+    - https://cmu.edu
+    - http://ubuntu.com
+    - https://ndtv.com
+    - http://pcmag.com
+    - https://udemy.com
+    - http://cocolog-nifty.com
+    - https://m.me
+    - http://com.com
+    - https://evernote.com
+    - http://ca.gov
+    - https://parallels.com
+    - http://soratemplates.com
+    - https://gooyaabitemplates.com
+    - http://sina.com.cn
+    - https://dreniq.com
+    - http://howstuffworks.com
+    - https://state.gov
+    - http://behance.net
+    - https://xinhuanet.com
+    - http://scientificamerican.com
+    - https://sky.com
+    - http://espn.go.com
+    - https://entrepreneur.com
+    - http://biblegateway.com
+    - https://pexels.com
+    - http://pinterest.co.uk
+    - https://naver.jp
+    - http://pastebin.com
+    - https://unicef.org
+    - http://jstor.org
+    - https://feedproxy.google.com
+    - http://arstechnica.com
+    - https://sports.yahoo.com
+    - http://csmonitor.com
+    - https://iubenda.com
+    - http://daum.net
+    - https://alexa.com
+    - http://mystrikingly.com
+    - https://imageshack.com
+    - http://www.livejournal.com
+    - https://transandfiestas.ga
+    - http://house.gov
+    - https://sakura.ne.jp
+    - http://last.fm
+    - https://elsevier.com
+    - http://worldbank.org
+    - https://narod.ru
+    - http://ftc.gov
+    - https://fastcompany.com
+    - http://standard.co.uk
+    - https://coursera.org
+    - http://dribbble.com
+    - https://rollingstone.com
+    - http://prnewswire.com
+    - https://freepik.com
+    - http://iso.org
+    - https://pewresearch.org
+    - http://usgs.gov
+    - https://wiktionary.org
+    - http://weforum.org
+    - https://amazon.ca
+    - http://mercurynews.com
+    - https://debian.org
+    - http://fb.me
+    - https://archives.gov
+    - http://ehow.com
+    - https://about.me
+    - http://fortune.com
+    - https://a8.net
+    - http://fifa.com
+    - https://upenn.edu
+    - http://blog.fc2.com
+    - https://dreamstime.com
+    - http://indiegogo.com
+    - https://fda.gov
+    - http://calendar.google.com
+    - https://ieee.org
+    - http://amazon.it
+    - https://namesilo.com
+    - http://arxiv.org
+    - https://thoughtco.com
+    - http://steamcommunity.com
+    - https://billboard.com
+    - http://thenextweb.com
+    - https://inc.com
+    - http://viagens.com.br
+    - https://adweek.com
+    - http://qz.com
+    - https://boston.com
+    - http://merriam-webster.com
+    - https://ssl-images-amazon.com
+    - http://histats.com
+    - https://nba.com
+    - http://digitaltrends.com
+    - https://eonline.com
+    - http://amazon.in
+    - https://ucoz.ru
+    - http://popsugar.com
+    - https://stuff.co.nz
+    - http://weather.com
+    - https://lonelyplanet.com
+    - http://techradar.com
+    - https://foursquare.com
+    - http://megaupload.com
+    - https://outlook.com
+    - http://thehill.com
+    - https://video.google.com
+    - http://channel4.com
+    - https://excite.co.jp
+    - http://teamviewer.com
+    - https://thedailybeast.com
+    - http://offset.com
+    - https://allrecipes.com
+    - http://home.neustar
+    - https://bp1.blogger.com
+    - http://businesswire.com
+    - https://psu.edu
+    - http://huawei.com
+
