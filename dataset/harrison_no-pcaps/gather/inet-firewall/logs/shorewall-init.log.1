@@ -1,0 +1,310 @@
+Feb  3 07:13:35 Processing /etc/shorewall/params ...
+Feb  3 07:13:35 Processing /etc/shorewall/shorewall.conf...
+Feb  3 07:13:35 Loading Modules...
+Feb  3 07:13:36 Compiling /etc/shorewall/zones...
+Feb  3 07:13:36 Compiling /etc/shorewall/interfaces...
+Feb  3 07:13:36    Interface "inet ens3 nosmurfs" Validated
+Feb  3 07:13:36    Interface "lan ens6 routeback" Validated
+Feb  3 07:13:36    Interface "dmz ens7 routeback" Validated
+Feb  3 07:13:36 Determining Hosts in Zones...
+Feb  3 07:13:36    fw (firewall)
+Feb  3 07:13:36    inet (ipv4)
+Feb  3 07:13:36       ens3:0.0.0.0/0
+Feb  3 07:13:36    lan (ipv4)
+Feb  3 07:13:36       ens6:0.0.0.0/0
+Feb  3 07:13:36    dmz (ipv4)
+Feb  3 07:13:36       ens7:0.0.0.0/0
+Feb  3 07:13:36 Locating Action Files...
+Feb  3 07:13:36 Compiling /etc/shorewall/policy...
+Feb  3 07:13:36    Policy for fw to inet is ACCEPT using chain fw-all
+Feb  3 07:13:36    Policy for fw to lan is ACCEPT using chain fw-all
+Feb  3 07:13:36    Policy for fw to dmz is ACCEPT using chain fw-all
+Feb  3 07:13:36    Policy for lan to inet is ACCEPT using chain lan-inet
+Feb  3 07:13:36    Policy for lan to dmz is ACCEPT using chain lan-dmz
+Feb  3 07:13:36    Policy for dmz to inet is ACCEPT using chain dmz-inet
+Feb  3 07:13:36    Policy for fw to inet is REJECT using chain all-all
+Feb  3 07:13:36    Policy for fw to lan is REJECT using chain all-all
+Feb  3 07:13:36    Policy for fw to dmz is REJECT using chain all-all
+Feb  3 07:13:36    Policy for inet to fw is REJECT using chain all-all
+Feb  3 07:13:36    Policy for inet to lan is REJECT using chain all-all
+Feb  3 07:13:36    Policy for inet to dmz is REJECT using chain all-all
+Feb  3 07:13:36    Policy for lan to fw is REJECT using chain all-all
+Feb  3 07:13:36    Policy for lan to inet is REJECT using chain all-all
+Feb  3 07:13:36    Policy for lan to dmz is REJECT using chain all-all
+Feb  3 07:13:36    Policy for dmz to fw is REJECT using chain all-all
+Feb  3 07:13:36    Policy for dmz to inet is REJECT using chain all-all
+Feb  3 07:13:36    Policy for dmz to lan is REJECT using chain all-all
+Feb  3 07:13:36 Adding Anti-smurf Rules
+Feb  3 07:13:36 Compiling TCP Flags filtering...
+Feb  3 07:13:36 Compiling Kernel Route Filtering...
+Feb  3 07:13:36 Compiling Martian Logging...
+Feb  3 07:13:36 Compiling /etc/shorewall/snat...
+Feb  3 07:13:36     Snat record "MASQUERADE 192.168.128.0/18 ens3 - - - - - - - -" Compiled
+Feb  3 07:13:36     Snat record "MASQUERADE 10.237.0.0/18 ens3 - - - - - - - -" Compiled
+Feb  3 07:13:36 Compiling MAC Filtration -- Phase 1...
+Feb  3 07:13:36    Chain ens3_iop deleted
+Feb  3 07:13:36    Chain ens3_fop deleted
+Feb  3 07:13:36    Chain ens6_iop deleted
+Feb  3 07:13:36    Chain ens6_fop deleted
+Feb  3 07:13:36    Chain ens7_iop deleted
+Feb  3 07:13:36    Chain ens7_fop deleted
+Feb  3 07:13:36 Compiling /etc/shorewall/rules...
+Feb  3 07:13:36     Rule "DNAT inet dmz:10.237.2.255 tcp 25,587,143,993,110,995 - - -" Compiled
+Feb  3 07:13:36     Rule "DNAT inet dmz:10.237.0.166 tcp 80,443 - - -" Compiled
+Feb  3 07:13:36     Rule "DNAT inet dmz:10.237.1.238 udp 1194 - - -" Compiled
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.SSH...
+Feb  3 07:13:36     Rule "PARAM - - tcp 22" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.SSH
+Feb  3 07:13:36     Rule "SSH/ACCEPT inet fw - - - - -" Compiled
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.SSH...
+Feb  3 07:13:36     Rule "PARAM - - tcp 22" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.SSH
+Feb  3 07:13:36     Rule "SSH/ACCEPT lan fw - - - - -" Compiled
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.DNS...
+Feb  3 07:13:36     Rule "PARAM - - udp 53" Compiled
+Feb  3 07:13:36     Rule "PARAM - - tcp 53" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.DNS
+Feb  3 07:13:36     Rule "DNS/ACCEPT lan fw - - - - -" Compiled
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.DNS...
+Feb  3 07:13:36     Rule "PARAM - - udp 53" Compiled
+Feb  3 07:13:36     Rule "PARAM - - tcp 53" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.DNS
+Feb  3 07:13:36     Rule "DNS/ACCEPT dmz fw - - - - -" Compiled
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36 ..Expanding Macro /usr/share/shorewall/macro.Ping...
+Feb  3 07:13:36     Rule "PARAM - - icmp 8" Compiled
+Feb  3 07:13:36 ..End Macro /usr/share/shorewall/macro.Ping
+Feb  3 07:13:36     Rule "Ping/ACCEPT all all - - - - -" Compiled
+Feb  3 07:13:36     Rule "ACCEPT dmz:10.237.1.238 lan all - - - -" Compiled
+Feb  3 07:13:36     Rule "ACCEPT dmz:10.237.0.4 lan:192.168.131.109 udp 137 - - -" Compiled
+Feb  3 07:13:36     Rule "ACCEPT dmz:10.237.0.4 lan:192.168.131.109 udp 138 - - -" Compiled
+Feb  3 07:13:36     Rule "ACCEPT dmz:10.237.0.4 lan:192.168.131.109 udp 139 - - -" Compiled
+Feb  3 07:13:36     Rule "ACCEPT dmz:10.237.0.4 lan:192.168.131.109 udp 445 - - -" Compiled
+Feb  3 07:13:36     Rule "ACCEPT dmz:10.237.0.4 lan:192.168.131.109 tcp 139 - - -" Compiled
+Feb  3 07:13:36     Rule "ACCEPT dmz:10.237.0.4 lan:192.168.131.109 tcp 445 - - -" Compiled
+Feb  3 07:13:36 Compiling /etc/shorewall/conntrack...
+Feb  3 07:13:36    Conntrack rule "CT:helper:amanda:PO - - udp 10080" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:amanda:PO - - udp 10080" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:ftp:PO - - tcp 21" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:ftp:PO - - tcp 21" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:RAS:PO - - udp 1719" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:RAS:PO - - udp 1719" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:Q.931:PO - - tcp 1720" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:Q.931:PO - - tcp 1720" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:irc:PO - - tcp 6667" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:irc:PO - - tcp 6667" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:netbios-ns:PO - - udp 137" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:netbios-ns:PO - - udp 137" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:pptp:PO - - tcp 1723" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:pptp:PO - - tcp 1723" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:sane:PO - - tcp 6566" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:sane:PO - - tcp 6566" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:sip:PO - - udp 5060" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:sip:PO - - udp 5060" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:snmp:PO - - udp 161" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:snmp:PO - - udp 161" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:tftp:PO - - udp 69" Compiled
+Feb  3 07:13:36    Conntrack rule "CT:helper:tftp:PO - - udp 69" Compiled
+Feb  3 07:13:36 Compiling MAC Filtration -- Phase 2...
+Feb  3 07:13:36 Applying Policies...
+Feb  3 07:13:36    Policy ACCEPT from fw to inet using chain fw-inet
+Feb  3 07:13:36    Policy ACCEPT from fw to lan using chain fw-lan
+Feb  3 07:13:36    Policy ACCEPT from fw to dmz using chain fw-dmz
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Broadcast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type BROADCAST" Compiled
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type ANYCAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Broadcast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Multicast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type MULTICAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Multicast
+Feb  3 07:13:36    Policy REJECT from inet to fw using chain inet-fw
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Broadcast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type BROADCAST" Compiled
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type ANYCAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Broadcast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Multicast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type MULTICAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Multicast
+Feb  3 07:13:36    Policy REJECT from inet to lan using chain inet-lan
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Broadcast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type BROADCAST" Compiled
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type ANYCAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Broadcast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Multicast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type MULTICAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Multicast
+Feb  3 07:13:36    Policy REJECT from inet to dmz using chain inet-dmz
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Broadcast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type BROADCAST" Compiled
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type ANYCAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Broadcast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Multicast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type MULTICAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Multicast
+Feb  3 07:13:36    Policy REJECT from lan to fw using chain lan-fw
+Feb  3 07:13:36    Policy ACCEPT from lan to inet using chain lan-inet
+Feb  3 07:13:36    Policy ACCEPT from lan to dmz using chain lan-dmz
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Broadcast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type BROADCAST" Compiled
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type ANYCAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Broadcast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Multicast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type MULTICAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Multicast
+Feb  3 07:13:36    Policy REJECT from dmz to fw using chain dmz-fw
+Feb  3 07:13:36    Policy ACCEPT from dmz to inet using chain dmz-inet
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Broadcast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type BROADCAST" Compiled
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type ANYCAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Broadcast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Multicast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type MULTICAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Multicast
+Feb  3 07:13:36    Policy REJECT from dmz to lan using chain dmz-lan
+Feb  3 07:13:36 Generating Rule Matrix...
+Feb  3 07:13:36    Handling complex zones...
+Feb  3 07:13:36    Entering main matrix-generation loop...
+Feb  3 07:13:36    Chain ens3_in deleted
+Feb  3 07:13:36    Chain ens3_fwd deleted
+Feb  3 07:13:36    Chain ens6_in deleted
+Feb  3 07:13:36    Chain ens6_fwd deleted
+Feb  3 07:13:36    Chain ens7_in deleted
+Feb  3 07:13:36    Chain ens7_fwd deleted
+Feb  3 07:13:36    Finishing matrix...
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Broadcast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type BROADCAST" Compiled
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type ANYCAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Broadcast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Multicast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type MULTICAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Multicast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Broadcast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type BROADCAST" Compiled
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type ANYCAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Broadcast
+Feb  3 07:13:36 ..Expanding inline action /usr/share/shorewall/action.Multicast...
+Feb  3 07:13:36     Rule " DROP - - - ;; -m addrtype --dst-type MULTICAST" Compiled
+Feb  3 07:13:36 ..End inline action /usr/share/shorewall/action.Multicast
+Feb  3 07:13:36 Optimizing Ruleset...
+Feb  3 07:13:36 
+  Table raw pass 1, 2 referenced chains, level 4a...
+Feb  3 07:13:36 
+  Table raw pass 2, 2 referenced chains, level 4b...
+Feb  3 07:13:36 
+  Table raw pass 2, 0 referenced user chains, level 8...
+Feb  3 07:13:36 
+  Table raw pass 3, 2 referenced user chains, level 16...
+Feb  3 07:13:36    Table raw Optimized -- Passes = 
+Feb  3 07:13:36 
+Feb  3 07:13:36 
+  Table nat pass 1, 6 referenced chains, level 4a...
+Feb  3 07:13:36 
+  Table nat pass 2, 6 referenced chains, level 4a...
+Feb  3 07:13:36 
+  Table nat pass 3, 6 referenced chains, level 4b...
+Feb  3 07:13:36 
+  Table nat pass 4, 2 short chains, level 4c...
+Feb  3 07:13:36 
+  Table nat pass 4, 2 referenced user chains, level 8...
+Feb  3 07:13:36 
+  Table nat pass 5, 6 referenced user chains, level 16...
+Feb  3 07:13:36    Table nat Optimized -- Passes = 
+Feb  3 07:13:36 
+Feb  3 07:13:36 
+  Table mangle pass 1, 10 referenced chains, level 4a...
+Feb  3 07:13:36    Chain tcin deleted
+Feb  3 07:13:36    Chain tcout deleted
+Feb  3 07:13:36    Chain tcpost deleted
+Feb  3 07:13:36    Chain tcpre deleted
+Feb  3 07:13:36    Empty chain tcfor deleted
+Feb  3 07:13:36 
+  Table mangle pass 2, 5 referenced chains, level 4a...
+Feb  3 07:13:36 
+  Table mangle pass 3, 5 referenced chains, level 4b...
+Feb  3 07:13:36 
+  Table mangle pass 3, 0 referenced user chains, level 8...
+Feb  3 07:13:36 
+  Table mangle pass 4, 5 referenced user chains, level 16...
+Feb  3 07:13:36    Table mangle Optimized -- Passes = 
+Feb  3 07:13:36 
+Feb  3 07:13:36 
+  Table filter pass 1, 26 referenced chains, level 4a...
+Feb  3 07:13:36     1 ACCEPT rules deleted from chain OUTPUT
+Feb  3 07:13:36     2 ACCEPT rules deleted from chain dmz-inet
+Feb  3 07:13:36     2 ACCEPT rules deleted from chain fw-dmz
+Feb  3 07:13:36     2 ACCEPT rules deleted from chain fw-inet
+Feb  3 07:13:36     2 ACCEPT rules deleted from chain fw-lan
+Feb  3 07:13:36     2 ACCEPT rules deleted from chain lan-dmz
+Feb  3 07:13:36     2 ACCEPT rules deleted from chain lan-inet
+Feb  3 07:13:36 
+  Table filter pass 2, 26 referenced chains, level 4a...
+Feb  3 07:13:36    1 references to chain dmz-inet replaced
+Feb  3 07:13:36    Chain dmz-inet deleted
+Feb  3 07:13:36    1 references to chain fw-dmz replaced
+Feb  3 07:13:36    Chain fw-dmz deleted
+Feb  3 07:13:36    1 references to chain fw-inet replaced
+Feb  3 07:13:36    Chain fw-inet deleted
+Feb  3 07:13:36    1 references to chain fw-lan replaced
+Feb  3 07:13:36    Chain fw-lan deleted
+Feb  3 07:13:36    1 references to chain lan-dmz replaced
+Feb  3 07:13:36    Chain lan-dmz deleted
+Feb  3 07:13:36    1 references to chain lan-inet replaced
+Feb  3 07:13:36    Chain lan-inet deleted
+Feb  3 07:13:36 
+  Table filter pass 3, 20 referenced chains, level 4a...
+Feb  3 07:13:36     4 ACCEPT rules deleted from chain OUTPUT
+Feb  3 07:13:36 
+  Table filter pass 4, 20 referenced chains, level 4a...
+Feb  3 07:13:36 
+  Table filter pass 5, 20 referenced chains, level 4b...
+Feb  3 07:13:36 
+  Table filter pass 6, 2 short chains, level 4c...
+Feb  3 07:13:36 
+  Table filter pass 6, 17 referenced user chains, level 8...
+Feb  3 07:13:36 
+  Table filter pass 7, 20 referenced user chains, level 16...
+Feb  3 07:13:36    Table filter Optimized -- Passes = 
+Feb  3 07:13:36 
+Feb  3 07:13:36 Creating iptables-restore input...
+Feb  3 07:13:36 Shorewall configuration compiled to /var/lib/shorewall/.start
+Feb  3 07:13:36 Starting Shorewall....
+Feb  3 07:13:36 Initializing...
+Feb  3 07:13:36 Setting up Route Filtering...
+Feb  3 07:13:36 Setting up Martian Logging...
+Feb  3 07:13:36 Disabling Kernel Automatic Helper Association
+Feb  3 07:13:36 Preparing iptables-restore input...
+Feb  3 07:13:36 Running /sbin/iptables-restore ...
+Feb  3 07:13:36 IPv4 Forwarding Enabled
+Feb  3 07:13:36 done.
