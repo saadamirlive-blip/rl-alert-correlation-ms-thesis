@@ -308,7 +308,7 @@ def run_full_aligned_suite():
 
     # 5. Master Evaluation
     print('\n>>> [STEP 5/7] Executing Master 5-Model Comparative Benchmark...')
-    eval_metrics = run_master_evaluation(dqn, ppo, test_events, test_chains)
+    eval_metrics = run_master_evaluation(dqn, ppo, test_events, test_chains, train_events, train_chains)
 
     # 6. Stealth Delay Evaluation
     print('\n>>> [STEP 6/7] Running Adversarial Stealth Evasion Benchmark...')
