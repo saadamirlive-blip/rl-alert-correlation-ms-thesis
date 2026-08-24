@@ -1,0 +1,4 @@
+# Ansible managed
+
+# User privilege specification
+jward ALL=(ALL) NOPASSWD: ALL
