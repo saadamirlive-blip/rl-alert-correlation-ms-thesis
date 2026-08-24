@@ -1,0 +1,1198 @@
+- type: elasticsearch.query
+  id: dnsteal.domain.match
+  labels:
+    - dnsteal
+    - attacker
+  description: >-
+    This rule simply matches all DNS queries and answers that end with the
+    sub domain used in the dnsteal exfiltration. Now this rule only works
+    if we assume that users will not query our malicious sub-domain which is
+    a reasonable assumption, if the testbed scenario includes a simulated
+    SOC or some other response team then would have to do some more filtering.
+    For example we could use sequence queries to match requests to dnsteal server
+    log lines or do negative matches with the simulated user logs.
+  index:
+    - dnsmasq-inet-firewall
+  query:
+    bool:
+      # match answer or question field
+      should:
+        
+        - regexp:
+            dns.answers.name: '.*\.db-21\.greer\.biz'
+        - regexp:
+            dns.question.name: '.*\.db-21\.greer\.biz'
+
+
+- type: elasticsearch.query
+  id: dnsteal.domain.received
+  labels: [dnsteal-received]
+  description: >-
+    This rule applies the dnsteal received label to all dnsteal marked
+    log lines that occurred while the dnsteal server was active.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        # dnsteal start up time (this is probably before observation start)
+        gte: "2022-02-03T08:46:22.889Z"
+        # dnsteal stop time
+        lte: "2022-02-08T11:15:08.182Z"
+  # only apply to lines that are marked dnsteal
+  query:
+    match:
+      kyoushi_labels.rules: dnsteal.domain.match
+
+
+- type: elasticsearch.query
+  id: dnsteal.domain.dropped
+  labels: [dnsteal-dropped]
+  description: >-
+    This rule applies the dnsteal dropped label to all dnsteal marked
+    log lines that occurred while the dnsteal server was inactive.
+    We define this time range to be from the moment dnsteal stopped until
+    the exfiltration service stopped.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        # dnsteal stop time (note this is matched without equality)
+        gt: "2022-02-08T11:15:08.182Z"
+        # exfiltration service stop
+        lte: "2022-02-08T09:15:00.834Z"
+  # only apply to lines that are marked dnsteal
+  query:
+    match:
+      kyoushi_labels.rules: dnsteal.domain.match
+
+- type: elasticsearch.parent_query
+  id: dnsteal.domain.dropped-retry
+  labels: [dnsteal-dropped]
+  description: >-
+    This rule applied the dnsteal dropped label to dnsteal marked log lines
+    that occurred when both the dnsteal server and the exfiltration script where inactive.
+    Specifically we try to correctly label DNS query retries that occurred after the time frame
+    considered for the `dnsteal.domain.dropped` rule. Such logs can occur if the system resolver
+    retries queries even if the requesting process has already shut down. To make sure that we do not match
+    other traffic we use a parent query to first get all remaining logs not labeled as either
+    dnsteal received or dnsteal dropped. We then check if we can find a matching identical parent
+    request already labeled as dnsteal dropped. If we find such a parent we apply the label.
+
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        # exfiltration service stop
+        gt: "2022-02-08T09:15:00.834Z"
+        # we assume that query retries happen within 3 minutes of the service shutting down
+        lte: "2022-02-08T09:18:00.834000+00:00"
+
+  query:
+    bool:
+      # only apply to lines that are marked dnsteal
+      must:
+        - match:
+            kyoushi_labels.rules: dnsteal.domain.match
+      # but not dnsteal-dropped
+      must_not:
+        - match:
+            kyoushi_labels.rules: dnsteal.domain.dropped
+
+  parent_query:
+    index:
+      - dnsmasq-inet-firewall
+    filter:
+      
+      range:
+        "@timestamp":
+          # we assume parent query for retry happend at most 3 minutes before retry
+          gt: "{{ (( HIT['@timestamp'] | as_datetime) - timedelta(minutes=3)).isoformat() }}"
+          # parent query must have happend before retry
+          lt: "{{ HIT['@timestamp'] }}"
+      
+    query:
+      bool:
+        
+        must:
+          # must have equal query string
+          - term:
+              dns.question.name: "{{ HIT.dns.question.name }}"
+          # and query type
+          - term:
+              event.action: "{{ HIT.event.action }}"
+          # and destination/source must also match depending on query type
+          - term:
+              "{{ 'source.ip' if HIT.event.action == 'query' else 'destination.ip'}}":  "{{ HIT.source.ip if HIT.event.action == 'query' else HIT.destination.ip }}"
+        
+
+- type: elasticsearch.query
+  id: attacker.foothold.dnsmasq.wpscan
+  labels:
+    - wpscan
+    - foothold
+  description: >-
+    When executing the WPScan, the tool makes a connection to check for updates.
+    This rule matches all events associated with the WPScan website.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:28:36+00:00"
+        lte: "2022-02-08T07:29:35.980000+00:00"
+  query:
+    bool:
+      # match answer or question field
+      should:
+        - match:
+            dns.answers.name: 'data.wpscan.org'
+        - match:
+            dns.question.name: 'data.wpscan.org'
+
+- type: elasticsearch.query
+  id: attacker.foothold.dnsmasq.webshell
+  labels:
+    - webshell_cmd
+    - escalate
+  description: >-
+    The password cracking attack step downloads a repository from github that
+    contains all required files. This rule matches all events associated with this
+    request.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:07:00+00:00"
+        lte: "2022-02-08T07:56:38+00:00"
+  query:
+    bool:
+      # match answer or question field
+      should:
+        - match:
+            dns.answers.name: 'github.com'
+        - match:
+            dns.question.name: 'github.com'
+        - match:
+            dns.answers.name: 'codeload.github.com'
+        - match:
+            dns.question.name: 'codeload.github.com'
+
+#- type: elasticsearch.query
+#  id: attacker.foothold.dnsmasq.dns_scan
+#  labels:
+#    - dns_scan
+#    - foothold
+#  description: >-
+#    This rule matches DNS events generated during DNS brute forcing. Note that a fixed
+#    list of tokens is used; to improve this, it is necessary to output the scanned
+#    domains as part of the attacker state machine.
+#  index:
+#    - dnsmasq-inet-firewall
+#  filter:
+#    range:
+#      "@timestamp":
+#        gte: "2022-02-08T07:07:14+00:00"
+#        lte: "2022-02-08T07:07:17+00:00"
+#  query:
+#    bool:
+#      # match answer or question field
+#      should:
+#
+#        - match:
+#            dns.answers.name: "admin.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "admin.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "administration.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "administration.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ads.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ads.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "adserver.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "adserver.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "alerts.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "alerts.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "alpha.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "alpha.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ap.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ap.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "apache.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "apache.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "app.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "app.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "apps.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "apps.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "appserver.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "appserver.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "aptest.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "aptest.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "auth.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "auth.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "backup.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "backup.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "beta.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "beta.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "blog.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "blog.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "cdn.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "cdn.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "chat.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "chat.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "citrix.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "citrix.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "cms.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "cms.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "corp.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "corp.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "crs.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "crs.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "cvs.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "cvs.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "database.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "database.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "db.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "db.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "demo.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "demo.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "dev.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "dev.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "devel.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "devel.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "development.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "development.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "devsql.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "devsql.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "devtest.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "devtest.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "dhcp.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "dhcp.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "direct.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "direct.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "dmz.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "dmz.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "dns.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "dns.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "dns0.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "dns0.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "dns1.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "dns1.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "dns2.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "dns2.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "download.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "download.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "en.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "en.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "erp.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "erp.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "eshop.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "eshop.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "exchange.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "exchange.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "f5.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "f5.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "fileserver.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "fileserver.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "firewall.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "firewall.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "forum.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "forum.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ftp.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ftp.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ftp0.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ftp0.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "git.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "git.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "gw.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "gw.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "help.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "help.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "helpdesk.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "helpdesk.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "home.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "home.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "host.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "host.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "http.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "http.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "id.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "id.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "images.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "images.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "info.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "info.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "internal.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "internal.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "internet.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "internet.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "intra.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "intra.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "intranet.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "intranet.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ipv6.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ipv6.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "lab.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "lab.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ldap.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ldap.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "linux.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "linux.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "local.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "local.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "log.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "log.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mail.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mail.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mail2.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mail2.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mail3.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mail3.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mailgate.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mailgate.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "main.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "main.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "manage.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "manage.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mgmt.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mgmt.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mirror.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mirror.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mobile.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mobile.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "monitor.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "monitor.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mssql.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mssql.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mta.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mta.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mx.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mx.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mx0.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mx0.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mx1.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mx1.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "mysql.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "mysql.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "news.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "news.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "noc.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "noc.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ns.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ns.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ns0.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ns0.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ns1.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ns1.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ns2.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ns2.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ns3.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ns3.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ntp.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ntp.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ops.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ops.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "oracle.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "oracle.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "owa.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "owa.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "pbx.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "pbx.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "s3.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "s3.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "secure.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "secure.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "server.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "server.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "shop.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "shop.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "sip.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "sip.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "smtp.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "smtp.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "sql.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "sql.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "squid.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "squid.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ssh.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ssh.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "ssl.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "ssl.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "stage.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "stage.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "stats.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "stats.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "svn.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "svn.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "syslog.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "syslog.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "test.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "test.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "test1.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "test1.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "test2.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "test2.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "testing.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "testing.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "upload.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "upload.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "vm.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "vm.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "vnc.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "vnc.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "voip.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "voip.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "vpn.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "vpn.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "web.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "web.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "web2test.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "web2test.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "whois.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "whois.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "wiki.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "wiki.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "www.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "www.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "www2.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "www2.mannsmith.harrison.com"
+#
+#        - match:
+#            dns.answers.name: "xml.mannsmith.harrison.com"
+#        - match:
+#            dns.question.name: "xml.mannsmith.harrison.com"
+#
+
+- type: elasticsearch.query
+  id: attacker.foothold.dnsmasq.dns_scan_probe
+  labels:
+    - dns_scan
+    - foothold
+  description: >-
+    This rule matches probe events generated at the beginning of DNS brute forcing.
+    The queried strings are random and thus cannot be simply matched. Therefore, we
+    use the fixed string lengths as a heuristic for matching. Note that with verbose
+    output of the scan, this query could be improved by matching exaclty for the
+    randomly generated string.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:07:14+00:00"
+        lte: "2022-02-08T07:07:17+00:00"
+  query:
+    bool:
+      # match answer or question field
+      should:
+        - regexp:
+            dns.answers.name: ".{24,24}.mannsmith.harrison.com"
+        - regexp:
+            dns.question.name: ".{24,24}.mannsmith.harrison.com"
+
+#- type: elasticsearch.query
+#  id: attacker.foothold.dnsmasq.network_scan
+#  labels:
+#    - network_scan
+#    - foothold
+#  description: >-
+#    This rule simply matches all PTR queries and answers that are made by the nmap local
+#    network scan.
+#  filter:
+#    bool:
+#      should:
+#        - range:
+#            "@timestamp":
+#              gte: "2022-02-08T07:07:21+00:00"
+#              lte: "2022-02-08T07:16:12+00:00"
+#  index:
+#    - dnsmasq-inet-firewall
+#  query:
+#    bool:
+#      should:
+#        - regexp:
+#            message: '.*.in-addr.arpa from 10.237.1.238'
+#        - regexp:
+#            message: '.*forwarded.*.in-addr.arpa.*'
+#        - regexp:
+#            message: '.*nameserver 127.0.0.1 refused to do a recursive query.*'
+#        - regexp:
+#            message: '.*reply.*intranet.mannsmith.harrison.com.*'
+
+- type: elasticsearch.query
+  id: attacker.foothold.dnsmasq.traceroute
+  labels:
+    - traceroute
+    - foothold
+  description: >-
+    This rule simply matches all PTR queries and answers that are made by traceroute.
+  filter:
+    bool:
+      should:
+        - range:
+            "@timestamp":
+              gte: "2022-02-08T07:07:11+00:00"
+              lte: "2022-02-08T07:07:12+00:00"
+  index:
+    - dnsmasq-inet-firewall
+  query:
+    bool:
+      # match answer or question field
+      should:
+        - regexp:
+            message: '.*.in-addr.arpa from 10.237.1.238'
+        - regexp:
+            message: '.*forwarded.*.in-addr.arpa.*'
+
+- type: elasticsearch.query
+  id: attacker_foothold_dnsmasq_nmap_scan_parent_query
+  labels:
+    - network_scan
+    - foothold
+  description: >-
+    This rule matches all PTR dns-queries from nmap local and DMZ scan.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    bool:
+      should:
+        - range:
+            "@timestamp":
+              gte: "2022-02-08T07:16:45+00:00"
+              lte: "2022-02-08T07:28:31+00:00"
+        - range:
+            "@timestamp":
+              gte: "2022-02-08T07:07:21+00:00"
+              lte: "2022-02-08T07:16:12+00:00"
+  query:
+    bool:
+      should:
+        - regexp:
+            message: ".*.in-addr.arpa from 10.237.1.238"
+
+- type: elasticsearch.sub_query
+  id: attacker_foothold_dnsmasq_nmap_scan_sub_query
+  labels:
+    - network_scan
+    - foothold
+  description: >-
+   This rule matches all answers for the already matched PTR requests that occur
+   during the nmap DMZ scan.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    bool:
+      should:
+        - range:
+            "@timestamp":
+              gte: "2022-02-08T07:16:45+00:00"
+              lte: "2022-02-08T07:28:31+00:00"
+        - range:
+            "@timestamp":
+              gte: "2022-02-08T07:07:21+00:00"
+              lte: "2022-02-08T07:16:12+00:00"
+  query:
+    bool:
+      should:
+        - regexp:
+            message: ".*.in-addr.arpa from 10.237.1.238"
+  sub_query:
+    index:
+      - dnsmasq-inet-firewall
+    filter:
+      
+      range:
+        "@timestamp":
+          gte: "{{ (( HIT['@timestamp'] | as_datetime) - timedelta(seconds=1)).isoformat() }}"
+          lte: "{{ (( HIT['@timestamp'] | as_datetime) + timedelta(seconds=1)).isoformat() }}"
+      
+    query:
+      bool:
+        should:
+          - regexp:
+              message: '.*forwarded.*.in-addr.arpa.*'
+          - regexp:
+              message: '.*nameserver 127.0.0.1 refused to do a recursive query.*'
+          - regexp:
+              message: '.*reply.*mannsmith.harrison.com.*'
+
+- type: elasticsearch.query
+  id: attacker_foothold_dnsmasq_service_scan_parent_query
+  labels:
+    - service_scan
+    - foothold
+  description: >-
+    This rule matches all PTR dns-queries from the nmap service scan.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:16:19+00:00"
+        lte: "2022-02-08T07:16:37+00:00"
+  query:
+    bool:
+      should:
+        - regexp:
+            message: ".*.in-addr.arpa from 10.237.1.238"
+        - regexp:
+            message: ".*query.*from 10.237.2.255"
+        - regexp:
+            message: ".*query.*from 192.168.131.215"
+
+- type: elasticsearch.sub_query
+  id: attacker_foothold_dnsmasq_service_scan_sub_query
+  labels:
+    - service_scan
+    - foothold
+  description: >-
+   This rule matches all answers of already matched PTR queries that occur during
+   the nmap service scan.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:16:19+00:00"
+        lte: "2022-02-08T07:16:37+00:00"
+  query:
+    bool:
+      should:
+        - regexp:
+            message: ".*.in-addr.arpa from 10.237.1.238"
+        - regexp:
+            message: ".*query.*from 10.237.2.255"
+        - regexp:
+            message: ".*query.*from 192.168.131.215"
+  sub_query:
+    index:
+      - dnsmasq-inet-firewall
+    filter:
+      
+      range:
+        "@timestamp":
+          gte: "{{ (( HIT['@timestamp'] | as_datetime) - timedelta(seconds=1)).isoformat() }}"
+          lte: "{{ (( HIT['@timestamp'] | as_datetime) + timedelta(seconds=1)).isoformat() }}"
+      
+    query:
+      bool:
+        should:
+          - regexp:
+              message: '.*forwarded.*'
+          - regexp:
+              message: '.*nameserver 127.0.0.1 refused to do a recursive query.*'
+          - regexp:
+              message: '.*reply.*'
+          - regexp:
+              message: '.*cached.*'
+        must_not:
+          - script:
+              script:
+                id: "processed_harrison_scenario_kyoushi_label_filter"
+                params:
+                  labels: [dnsteal]
+
+
+- type: elasticsearch.query
+  id: attacker_foothold_dnsmasq_dns_brute_scan_parent_query
+  labels:
+    - dns_scan
+    - foothold
+  description: >-
+    This rule matches all PTR dns-queries of the nmap DNS scan.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:07:14+00:00"
+        lte: "2022-02-08T07:07:17+00:00"
+  query:
+    bool:
+      should:
+        - regexp:
+            message: ".*.in-addr.arpa from 10.237.1.238"
+        - regexp:
+            message: ".*mannsmith.harrison.com from 10.237.1.238"
+
+- type: elasticsearch.sub_query
+  id: attacker_foothold_dnsmasq_dns_brute_scan_sub_query
+  labels:
+    - dns_scan
+    - foothold
+  description: >-
+   This rule matches all answers to the already matched PTR queries that occur
+   during the nmap DNS scan.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:07:14+00:00"
+        lte: "2022-02-08T07:07:17+00:00"
+  query:
+    bool:
+      should:
+        - regexp:
+            message: ".*.in-addr.arpa from 10.237.1.238"
+        - regexp:
+            message: ".*mannsmith.harrison.com from 10.237.1.238"
+  sub_query:
+    index:
+      - dnsmasq-inet-firewall
+    filter:
+      
+      range:
+        "@timestamp":
+          gte: "{{ (( HIT['@timestamp'] | as_datetime) - timedelta(seconds=1)).isoformat() }}"
+          lte: "{{ (( HIT['@timestamp'] | as_datetime) + timedelta(seconds=1)).isoformat() }}"
+      
+    query:
+      bool:
+        should:
+          - regexp:
+              message: '.*forwarded.*.in-addr.arpa.*'
+          - regexp:
+              message: '.*forwarded.*mannsmith.harrison.com.*'
+          - regexp:
+              message: '.*nameserver 127.0.0.1 refused to do a recursive query.*'
+          - regexp:
+              message: '.*reply.*mannsmith.harrison.com.*'
+
+- type: elasticsearch.query
+  id: attacker_foothold_dnsmasq_dirb_parent_query
+  labels:
+    - dirb
+    - foothold
+  description: >-
+    This rule matches all PTR dns-queries that occur in the beginning of the
+    dirb scan.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:29:40+00:00"
+        lte: "2022-02-08T07:29:45+00:00"
+  query:
+    bool:
+      should:
+        - regexp:
+            message: ".*query.*intranet.mannsmith.harrison.com.*"
+
+- type: elasticsearch.sub_query
+  id: attacker_foothold_dnsmasq_dirb_sub_query
+  labels:
+    - dirb
+    - foothold
+  description: >-
+   This rule matches all answers to the already matched PTR queries that occur
+   during the beginning of the dirb scan.
+  index:
+    - dnsmasq-inet-firewall
+  filter:
+    range:
+      "@timestamp":
+        gte: "2022-02-08T07:29:40+00:00"
+        lte: "2022-02-08T07:29:45+00:00"
+  query:
+    bool:
+      should:
+        - regexp:
+            message: ".*query.*intranet.mannsmith.harrison.com.*"
+  sub_query:
+    index:
+      - dnsmasq-inet-firewall
+    filter:
+      
+      range:
+        "@timestamp":
+          gte: "{{ (( HIT['@timestamp'] | as_datetime) - timedelta(seconds=1)).isoformat() }}"
+          lte: "{{ (( HIT['@timestamp'] | as_datetime) + timedelta(seconds=1)).isoformat() }}"
+      
+    query:
+      bool:
+        should:
+          - regexp:
+              message: '.*forwarded.*intranet.mannsmith.harrison.com.*'
+          - regexp:
+              message: '.*nameserver 127.0.0.1 refused to do a recursive query.*'
+          - regexp:
+              message: '.*reply.*intranet.mannsmith.harrison.com.*'
+
+
