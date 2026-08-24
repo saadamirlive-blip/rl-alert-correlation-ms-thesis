@@ -7,21 +7,21 @@
     "tp": 449,
     "fp": 0,
     "fn": 0,
-    "tn": 0,
-    "latency_us": 0.18,
-    "throughput_eps": 5475609
+    "tn": 449,
+    "latency_us": 0.25,
+    "throughput_eps": 4017897
   },
   "Isolation Forest": {
-    "precision": 1.0,
-    "recall": 0.1514476614699332,
-    "f1_score": 0.26305609284332687,
-    "false_alarm_rate": 0.0,
-    "tp": 68,
-    "fp": 0,
-    "fn": 381,
-    "tn": 0,
-    "latency_us": 1484.75,
-    "throughput_eps": 673
+    "precision": 0.17037037037037037,
+    "recall": 0.051224944320712694,
+    "f1_score": 0.07876712328767123,
+    "false_alarm_rate": 24.94432071269488,
+    "tp": 23,
+    "fp": 112,
+    "fn": 426,
+    "tn": 337,
+    "latency_us": 431.25,
+    "throughput_eps": 2318
   },
   "Supervised Random Forest": {
     "precision": 1.0,
@@ -31,32 +31,32 @@
     "tp": 449,
     "fp": 0,
     "fn": 0,
-    "tn": 0,
-    "latency_us": 260.9,
-    "throughput_eps": 3832
+    "tn": 449,
+    "latency_us": 261.44,
+    "throughput_eps": 3825
   },
   "Proposed RL (DQN)": {
-    "precision": 1.0,
+    "precision": 0.7975133214920072,
     "recall": 1.0,
-    "f1_score": 1.0,
-    "false_alarm_rate": 0.0,
+    "f1_score": 0.8873517786561265,
+    "false_alarm_rate": 25.389755011135858,
     "tp": 449,
-    "fp": 0,
+    "fp": 114,
     "fn": 0,
-    "tn": 0,
-    "latency_us": 13.72,
-    "throughput_eps": 72893
+    "tn": 335,
+    "latency_us": 17.05,
+    "throughput_eps": 58660
   },
   "Proposed RL (PPO)": {
-    "precision": 1.0,
+    "precision": 0.7397034596375618,
     "recall": 1.0,
-    "f1_score": 1.0,
-    "false_alarm_rate": 0.0,
+    "f1_score": 0.8503787878787878,
+    "false_alarm_rate": 35.18930957683742,
     "tp": 449,
-    "fp": 0,
+    "fp": 158,
     "fn": 0,
-    "tn": 0,
-    "latency_us": 23.87,
-    "throughput_eps": 41892
+    "tn": 291,
+    "latency_us": 28.46,
+    "throughput_eps": 35141
   }
 }
