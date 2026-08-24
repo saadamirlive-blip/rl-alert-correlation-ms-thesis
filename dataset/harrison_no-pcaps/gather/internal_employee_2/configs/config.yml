@@ -1,0 +1,37 @@
+# plugin system configuration
+plugin: 
+  # factory entry point plugins which should or should not be loaded
+  include_names: 
+    - .*
+  exclude_names:
+    []
+
+# logging configuration
+log: 
+  # the log level
+  level: INFO  
+  # configuration for the timestamp format
+  timestamp:
+    # string format
+    # (if this is no set a unix epoch timestamp will be used)
+    # format: e.g. %m/%d/%Y, %H:%M:%S
+    # use UTC time or the local time
+    utc: True
+    # the log event key to use
+    key: timestamp
+
+  # configuration of the console logger
+  console:
+    enabled: True
+    # output format
+    format: plain
+
+  # configuration of the file logger
+  file:
+    enabled: True
+    format: json 
+    # the path to log to
+    path: /var/log/kyoushi/ait.beta_user/sm.log  
+
+# control randomness        
+seed: 181882495
