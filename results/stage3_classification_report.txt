@@ -1,14 +1,13 @@
-                           precision    recall  f1-score   support
+                      precision    recall  f1-score   support
 
-                   BENIGN     1.0000    1.0000    1.0000     25122
-     Data_Exfiltration_C2     1.0000    1.0000    1.0000       106
-Host_Privilege_Escalation     1.0000    1.0000    1.0000       110
-        Network_Port_Scan     1.0000    1.0000    1.0000       136
-                  Web_RCE     1.0000    1.0000    1.0000        36
-        Web_SQL_Injection     1.0000    1.0000    1.0000        29
-                  Web_XSS     1.0000    1.0000    1.0000        27
-       Webshell_Execution     1.0000    1.0000    1.0000        31
+attacker_change_user     0.8750    0.9545    0.9130        22
+       attacker_http     1.0000    0.9818    0.9908        55
+        attacker_vpn     1.0000    1.0000    1.0000        86
+             dnsteal     0.9846    1.0000    0.9922        64
+            escalate     1.0000    1.0000    1.0000        46
+   escalated_command     1.0000    0.9189    0.9577        37
+        service_scan     0.8333    1.0000    0.9091         5
 
-                 accuracy                         1.0000     25597
-                macro avg     1.0000    1.0000    1.0000     25597
-             weighted avg     1.0000    1.0000    1.0000     25597
+            accuracy                         0.9841       315
+           macro avg     0.9561    0.9793    0.9661       315
+        weighted avg     0.9855    0.9841    0.9843       315
