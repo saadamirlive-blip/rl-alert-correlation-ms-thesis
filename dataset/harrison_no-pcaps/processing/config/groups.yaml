@@ -1,0 +1,122 @@
+all:
+  - internal_employee_1
+  - internal_employee_0
+  - remote_employee_5
+  - internal_employee_2
+  - remote_employee_2
+  - smith_mail
+  - ext_user_2
+  - ext_user_1
+  - ext_user_4
+  - ext_user_3
+  - taylor_mail
+  - vpn
+  - remote_employee_4
+  - remote_employee_1
+  - remote_employee_3
+  - internal_share
+  - remote_employee_0
+  - attacker_0
+  - cloud_share
+  - monitoring
+  - intranet_server
+  - mail
+  - ext_user_5
+  - webserver
+  - ext_user_0
+  - inet-dns
+  - inet-firewall
+attacker:
+  - attacker_0
+beatservers:
+  - internal_share
+  - intranet_server
+dmz:
+  - vpn
+  - cloud_share
+  - mail
+  - webserver
+dnat:
+  - webserver
+  - vpn
+  - mail
+dnsservers:
+  - inet-dns
+  - inet-firewall
+employee:
+  - internal_employee_1
+  - internal_employee_0
+  - remote_employee_5
+  - internal_employee_2
+  - remote_employee_2
+  - remote_employee_4
+  - remote_employee_1
+  - remote_employee_3
+  - remote_employee_0
+ext_mail:
+  - smith_mail
+  - taylor_mail
+ext_user:
+  - ext_user_2
+  - ext_user_1
+  - ext_user_4
+  - ext_user_3
+  - ext_user_5
+  - ext_user_0
+firewall:
+  - inet-firewall
+internal_employee:
+  - internal_employee_1
+  - internal_employee_0
+  - internal_employee_2
+internet:
+  - remote_employee_5
+  - remote_employee_2
+  - smith_mail
+  - ext_user_2
+  - ext_user_1
+  - ext_user_4
+  - ext_user_3
+  - taylor_mail
+  - remote_employee_4
+  - remote_employee_1
+  - remote_employee_3
+  - remote_employee_0
+  - attacker_0
+  - ext_user_5
+  - ext_user_0
+  - inet-dns
+intranet:
+  - internal_employee_1
+  - internal_employee_0
+  - internal_employee_2
+  - internal_share
+  - monitoring
+  - intranet_server
+mailserver:
+  - smith_mail
+  - taylor_mail
+  - mail
+management: []
+proxied:
+  - cloud_share
+  - mail
+remote_employee:
+  - remote_employee_5
+  - remote_employee_2
+  - remote_employee_4
+  - remote_employee_1
+  - remote_employee_3
+  - remote_employee_0
+servers:
+  - vpn
+  - internal_share
+  - cloud_share
+  - monitoring
+  - intranet_server
+  - mail
+  - webserver
+  - inet-firewall
+share:
+  - internal_share
+ungrouped: []
